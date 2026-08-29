@@ -57,10 +57,15 @@ act = tabellio.parse("register-page.jpg", output_mode="simple")
 ```
 
 - `output_mode="full"` (default) — rich `Act`: raw spelling, per-field
-  `confidence`, inference flags, validation `warnings`.
+  `confidence`, inference flags, validation `warnings`. `act.date` is the date
+  of the *act*; the subject's real **birth / death** (often a different day —
+  *"né la veille"*, *"décédé hier"*) lands on `persons[i].birth_date` /
+  `death_date`, `inferred: true` with a note when deduced. `validate` warns if a
+  baptism or burial has no such date on its subject.
 - `output_mode="simple"` — sends a shorter prompt, returns a bare `ActSummary`:
   `type`, `date` (ISO string or `null`), `location`, `persons`. No confidence,
-  no raw, no inference, no notes, no `language`. Fewer tokens in and out.
+  no raw, no inference, no notes, no `language`, **no life-event dates** — use
+  full for those. Fewer tokens in and out.
 
 ### Hints
 

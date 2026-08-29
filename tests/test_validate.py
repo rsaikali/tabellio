@@ -65,8 +65,48 @@ def test_clean_act_no_warnings():
             "type": "baptism",
             "date": {"raw": "x", "iso": "1710-04-04", "confidence": 0.95},
             "persons": [
-                {"role": "subject", "given": {"value": "Anne", "raw": "Anne", "confidence": 0.9}}
+                {
+                    "role": "subject",
+                    "given": {"value": "Anne", "raw": "Anne", "confidence": 0.9},
+                    "birth_date": {"raw": "ce jour", "iso": "1710-04-04", "confidence": 0.9},
+                }
             ],
+        }
+    )
+    validate(act)
+    assert act.warnings == []
+
+
+def test_baptism_without_birth_date_is_flagged():
+    act = Act.model_validate(
+        {
+            "type": "baptism",
+            "date": {"raw": "x", "iso": "1710-04-04", "confidence": 0.95},
+            "persons": [{"role": "subject", "given": {"value": "Anne", "confidence": 0.9}}],
+        }
+    )
+    validate(act)
+    assert any("no birth date recorded" in w for w in act.warnings)
+
+
+def test_burial_without_death_date_is_flagged():
+    act = Act.model_validate(
+        {
+            "type": "burial",
+            "date": {"raw": "x", "iso": "1710-04-04", "confidence": 0.95},
+            "persons": [{"role": "subject", "given": {"value": "Anne", "confidence": 0.9}}],
+        }
+    )
+    validate(act)
+    assert any("no death date recorded" in w for w in act.warnings)
+
+
+def test_birth_act_not_flagged_for_missing_birth_date():
+    act = Act.model_validate(
+        {
+            "type": "birth",
+            "date": {"raw": "x", "iso": "1710-04-04", "confidence": 0.95},
+            "persons": [{"role": "subject", "given": {"value": "Anne", "confidence": 0.9}}],
         }
     )
     validate(act)

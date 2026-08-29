@@ -18,6 +18,13 @@ _EXPECTED_ROLES: dict[ActType, set[Role]] = {
     ActType.MARRIAGE: {Role.GROOM, Role.BRIDE},
 }
 
+#: For these act types the recorded event usually predates the act; the real
+#: date belongs on the subject, not (only) on ``act.date``.
+_EVENT_DATE_FIELD: dict[ActType, tuple[str, str]] = {
+    ActType.BAPTISM: ("birth_date", "birth"),
+    ActType.BURIAL: ("death_date", "death"),
+}
+
 
 def _check_roles(act: Act, out: list[str]) -> None:
     present = {p.role for p in act.persons}
@@ -46,6 +53,22 @@ def _check_inferred_dates(act: Act, out: list[str]) -> None:
                 out.append(f"{kind} date for {name} is inferred")
 
 
+def _check_event_date_captured(act: Act, out: list[str]) -> None:
+    field_kind = _EVENT_DATE_FIELD.get(act.type)
+    if field_kind is None:
+        return
+    field, kind = field_kind
+    subject = next((p for p in act.persons if p.role is Role.SUBJECT), None)
+    if subject is None:
+        return  # already flagged by _check_roles
+    d = getattr(subject, field)
+    if d is None or (d.raw is None and d.iso is None):
+        out.append(
+            f"{act.type} act: no {kind} date recorded for the subject "
+            f"(check whether the act states or implies one)"
+        )
+
+
 def _check_low_confidence(act: Act, out: list[str]) -> None:
     if act.date.raw and act.date.confidence < LOW_CONFIDENCE:
         out.append(f"low confidence on act date ({act.date.confidence:.2f})")
@@ -69,6 +92,7 @@ def validate(act: Act) -> Act:
         _check_two_digit_year(p.birth_date, f"{p.role} birth date", warnings)
         _check_two_digit_year(p.death_date, f"{p.role} death date", warnings)
     _check_inferred_dates(act, warnings)
+    _check_event_date_captured(act, warnings)
     _check_low_confidence(act, warnings)
     act.warnings = warnings
     return act

@@ -65,10 +65,15 @@ Decision chain, in the order it was settled:
 An extracted act yields at least:
 
 - `type`: `birth` | `baptism` | `marriage` | `death` | `burial`
-- `date`: date of the act + raw spelling (`raw`), `confidence`
+- `date`: date **of the act** (the ceremony / registration) + raw spelling (`raw`), `confidence`
 - `place`: town / parish
 - `persons[]`: role (subject, father, mother, groom, bride, witness, godparent…),
-  `given` / `surname`, dates and places cited, per-field `confidence`
+  `given` / `surname`, per-field `confidence`, plus the **life-event** dates and
+  places on the person: `birth_date` / `birth_place`, `death_date` / `death_place`.
+  For a baptism the subject's real birth (often "né la veille" etc.) goes in
+  `birth_date` with `inferred: true` + note when deduced; for a burial the
+  death goes in `death_date`. `validate` flags a baptism/burial whose subject
+  has no such date.
 - `other[]`: occupations (`occupation`), marginal notes, reading notes
 - `source_hint`: guessed register type (parish vs civil registry) from the form of the act
 - `language`: model-detected ISO 639-1 code (full mode only)

@@ -15,7 +15,7 @@ import json
 
 from tabellio.schema import Act, ActSummary
 
-PROMPT_VERSION = "2"
+PROMPT_VERSION = "3"
 
 _FULL_SYSTEM = """\
 You are a palaeographer transcribing a single archival vital record (civil
@@ -33,8 +33,15 @@ Rules:
   never beyond what the abbreviation stands for.
 - Never invent a name, date, place or fact that is not legible in the image.
 - For each transcribed field give a `confidence` between 0 and 1.
-- A date deduced (for instance from a stated age) must have `inferred: true` and
-  a `note` explaining the deduction.
+- Keep the act's own date (`date`: the baptism / burial / marriage ceremony or
+  the registration) separate from the life events it records. For a baptism,
+  fill the child's real birth in `persons[subject].birth_date` / `birth_place`
+  whenever the act states it or lets you deduce it ("ne la veille", "born this
+  morning", "hier", "aujourd'hui a six heures"). For a death or burial, do the
+  same with `persons[subject].death_date` / `death_place`. These are often on a
+  different day from the act itself.
+- A date deduced (from a stated age, "la veille", "hier"...) must have
+  `inferred: true` and a `note` explaining the deduction.
 - If a field cannot be read, leave it null and add a short `note`. Do not guess.
 - `language`: the act's main language as an ISO 639-1 code ("fr", "la", "de"...).
 - `source_hint`: "parish" for religious registers, "civil" for state civil
@@ -76,6 +83,13 @@ _FULL_EXAMPLE = {
             "role": "subject",
             "given": {"value": "Jeanne", "raw": "Jeanne", "confidence": 0.95},
             "surname": {"value": "Dupont", "raw": "Dupont", "confidence": 0.8},
+            "birth_date": {
+                "raw": "nee la veille",
+                "iso": "1703-05-11",
+                "confidence": 0.8,
+                "inferred": True,
+                "note": "act says 'nee la veille'; act dated 1703-05-12",
+            },
         },
         {
             "role": "father",
