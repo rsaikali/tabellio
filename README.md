@@ -11,8 +11,10 @@ JSON**.
 - **No embedded model, no training, no storage.** Reliability comes from a
   strict [Pydantic](https://docs.pydantic.dev) schema and post-extraction
   consistency rules, not from trusting the model.
-- **No silent resolution.** Original spelling is kept, inferred dates are
-  flagged, every field carries a `confidence`.
+- **No silent resolution.** Original spelling is kept, every date carries a
+  `qualifier` (exact / about / calculated / …), every field a `confidence`.
+- **GEDCOM 7 out of the box.** `tabellio.to_gedcom(act)` — schema built to map
+  cleanly to GEDCOM.
 - **Any language or script.** Text is transcribed in the language of the act
   (Latin, French, German, …) and **never translated**; only the schema's
   `type` / `role` vocabulary is fixed English. The detected language is recorded
@@ -57,11 +59,11 @@ act = tabellio.parse("register-page.jpg", output_mode="simple")
 ```
 
 - `output_mode="full"` (default) — rich `Act`: raw spelling, per-field
-  `confidence`, inference flags, validation `warnings`. `act.date` is the date
+  `confidence`, date `qualifier`, validation `warnings`. `act.date` is the date
   of the *act*; the subject's real **birth / death** (often a different day —
   *"né la veille"*, *"décédé hier"*) lands on `persons[i].birth_date` /
-  `death_date`, `inferred: true` with a note when deduced. `validate` warns if a
-  baptism or burial has no such date on its subject.
+  `death_date` with `qualifier: "calculated"` + a note when deduced. `validate`
+  warns if a baptism or burial has no such date on its subject.
 - `output_mode="simple"` — sends a shorter prompt, returns a bare `ActSummary`:
   `type`, `date` (ISO string or `null`), `location`, `persons`. No confidence,
   no raw, no inference, no notes, no `language`, **no life-event dates** — use
@@ -75,6 +77,29 @@ tabellio.parse(img, act_type_hint="baptism", act_language_hint="la")
 
 Both are optional guesses; the model verifies them against the image. `--hint`
 and `--lang` on the CLI.
+
+### GEDCOM
+
+```python
+act = tabellio.parse("register-page.jpg")  # the one network call
+print(act.model_dump_json(indent=2))  # JSON
+print(tabellio.to_gedcom(act))  # a complete GEDCOM 7.0 document
+```
+
+`to_gedcom(act)` writes one `SOUR` record for the act, one `INDI` per person it
+names, and a `FAM` for the couple or parent-child link the act *states* —
+`BIRT` / `BAPM` / `MARR` / `DEAT` / `BURI` events with `DATE` / `PLAC` / `AGE`,
+`ASSO` + `ROLE` for witnesses and godparents, `QUAY` from `confidence`. It
+transcribes one act; it does **not** merge a tree — your genealogy software does
+that on import. Output is conformance-checked against the `gedcom7` library in
+the test suite.
+
+CLI: `python -m tabellio data/act.jpg --format gedcom`.
+
+The schema is GEDCOM-mappable by design: `GenDate.qualifier`
+(`about`/`before`/`after`/`calculated` → `ABT`/`BEF`/`AFT`/`CAL`),
+`GenDate.calendar` (`julian`, `french_republican`), `Person.name_particle`
+(`SPFX`), `Person.name_suffix` (`NSFX`).
 
 ### Configuration
 
@@ -94,12 +119,12 @@ The key is never logged and never stored.
 ```bash
 export TABELLIO_PROVIDER=gemini
 export TABELLIO_KEY=...              # in your shell
-python -m tabellio data/act.jpg [--hint baptism] [--output simple] [-v]
+python -m tabellio data/act.jpg [--hint baptism] [--output simple] [--format gedcom] [-v]
 ```
 
-Prints the act as JSON on stdout, warnings on stderr. The key is only read
-from the environment — never a CLI argument. `--provider`, `--model` and
-`--output` override the defaults.
+Prints the act as JSON (or GEDCOM 7 with `--format gedcom`) on stdout, warnings
+on stderr. The key is only read from the environment — never a CLI argument.
+`--provider`, `--model`, `--output` and `--format` override the defaults.
 
 ## Providers
 
@@ -133,10 +158,10 @@ implemented.
 ## Scope
 
 **In:** extraction of a single record to schema, ambiguity flags, confidence
-surfacing, provider-agnostic adapter.
+surfacing, provider-agnostic adapter, JSON and GEDCOM 7 output.
 
 **Out:** embedded/trained model, home-grown HTR, storage, accounts, billing,
-GEDCOM import or writing into a tree, image segmentation / deskew,
+GEDCOM *import*, building or merging a family tree, image segmentation / deskew,
 **translation** of any transcribed text.
 
 ## Development

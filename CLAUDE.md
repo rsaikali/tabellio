@@ -55,7 +55,8 @@ Decision chain, in the order it was settled:
 | Config | Three env vars, each a fallback for a `parse()` arg (explicit arg wins): `TABELLIO_PROVIDER`, `TABELLIO_KEY`, `TABELLIO_MODEL`. Nothing else read from the environment. |
 | Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. All take `timeout=` (default 120s), `max_retries=0`. **NIM hosted endpoint rejects inline images >180 KB** (NVCF asset upload not implemented) → `NIMProvider` re-encodes in memory via `image.fit_within` (JPEG quality down, then downscale, long edge ≥ 1200 px; source untouched; loguru warning), or raises with `shrink=False`. Needs Pillow (`tabellio[nim]` / `tabellio[resize]`). Default model `meta/llama-3.2-11b-vision-instruct` (the 90B times out on the free tier) — small, hallucinates on cursive, use `output_mode="simple"`. **Gemini is the real path; NIM is runnable, not good.** |
 | Output | JSON validated by a **Pydantic** schema. `output_mode="full"` (default) -> `Act`; `output_mode="simple"` -> `ActSummary` (type/date/location/persons only), via a shorter prompt + its own schema. |
-| Ambiguity | No silent resolution: keep the original spelling, flag inferred dates, `confidence`. |
+| Serialisers | One `parse()` (the only network call). `act.model_dump_json()` = JSON. `tabellio.to_gedcom(act)` = a complete **GEDCOM 7.0** document (`gedcom.py`; conformance-checked in tests against the `gedcom7` lib). No YAML helper (one-liner + a dep). Schema is GEDCOM-mappable by design: `GenDate.qualifier`/`calendar`, `Person.name_particle`/`name_suffix`, `Role` → `ASSO.ROLE`. |
+| Ambiguity | No silent resolution: keep the original spelling, `qualifier` on every date, per-field `confidence`. |
 | Act language | **International.** Any language or script (French, Latin, German, Dutch, Spanish, …). **Transcribe, never translate**: `raw`/`value` free text stays in the source language, Latinised names stay Latinised. Only `type` and `role` are a fixed English vocabulary. `Act.language` = model-detected ISO 639-1 code (full mode only). Optional `act_language_hint=` / `--lang`, verified against the image like `act_type_hint`. |
 | Storage | **None.** No database, no disk cache of user content. |
 | Accounts / billing | **None.** Permanently out of scope for the library. |
@@ -68,12 +69,15 @@ An extracted act yields at least:
 - `date`: date **of the act** (the ceremony / registration) + raw spelling (`raw`), `confidence`
 - `place`: town / parish
 - `persons[]`: role (subject, father, mother, groom, bride, witness, godparent…),
-  `given` / `surname`, per-field `confidence`, plus the **life-event** dates and
-  places on the person: `birth_date` / `birth_place`, `death_date` / `death_place`.
-  For a baptism the subject's real birth (often "né la veille" etc.) goes in
-  `birth_date` with `inferred: true` + note when deduced; for a burial the
-  death goes in `death_date`. `validate` flags a baptism/burial whose subject
-  has no such date.
+  `given` / `surname` / `name_particle` (SPFX) / `name_suffix` (NSFX), per-field
+  `confidence`, plus the **life-event** dates and places on the person:
+  `birth_date` / `birth_place`, `death_date` / `death_place`. For a baptism the
+  subject's real birth (often "né la veille" etc.) goes in `birth_date`; for a
+  burial the death goes in `death_date`. `validate` flags a baptism/burial whose
+  subject has no such date.
+- `GenDate`: `raw`, `iso` (always proleptic-Gregorian), `qualifier`
+  (`exact|about|before|after|between|calculated` → GEDCOM `ABT`/`BEF`/`AFT`/`CAL`),
+  `calendar` (`gregorian|julian|french_republican`), `confidence`, `note`.
 - `other[]`: occupations (`occupation`), marginal notes, reading notes
 - `source_hint`: guessed register type (parish vs civil registry) from the form of the act
 - `language`: model-detected ISO 639-1 code (full mode only)
@@ -115,7 +119,9 @@ tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
 
 - Embedded local model, fine-tuning, home-grown HTR.
 - Storage, accounts, billing, dashboard, job queue.
-- GEDCOM re-import or writing into a tree — the library **extracts**, full stop.
+- Building or **merging a family tree**. `to_gedcom` emits one act's people +
+  events + the couple/parent links the act *states* — deduplication and tree
+  merging happen in the genealogist's software on import. No GEDCOM re-import.
 - Image segmentation / heavy pre-processing (deskew, binarization) in v1.
   (Exception: `image.fit_within` re-encodes in memory *only* to satisfy NIM's
   180 KB transport limit — not an enhancement step, never touches the source.)

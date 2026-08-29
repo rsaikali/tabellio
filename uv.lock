@@ -505,6 +505,15 @@ wheels = [
 ]
 
 [[package]]
+name = "gedcom7"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/1a/30b3f98ce05a0c39d3df10d937839a4427d7f078f7cceb79e6ce49d9b835/gedcom7-1.1.0.tar.gz", hash = "sha256:2e18d11c5e39169033d23fd2d240b3ef16549d1ddd6ed9fb3dd47d45fe7a0136", size = 60271, upload-time = "2026-08-18T07:28:09.247Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dc/d5/b3fdcc263df986e96aaa992308d2c7e3f9836201302f00eaf3ca847f28b1/gedcom7-1.1.0-py3-none-any.whl", hash = "sha256:b1f7abc437778a23b7a9654a396e671b0a90339a31bf20db3743eff720109291", size = 32116, upload-time = "2026-08-18T07:28:07.978Z" },
+]
+
+[[package]]
 name = "google-auth"
 version = "2.57.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1143,6 +1152,7 @@ resize = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "gedcom7" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
@@ -1169,6 +1179,7 @@ provides-extras = ["gemini", "openai", "nim", "anthropic", "ollama", "resize", "
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "gedcom7", specifier = ">=1.1" },
     { name = "pytest", specifier = ">=8.2" },
     { name = "pytest-cov", specifier = ">=5.0" },
     { name = "ruff", specifier = ">=0.6" },

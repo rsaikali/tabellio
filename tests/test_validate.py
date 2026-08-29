@@ -28,21 +28,34 @@ def test_two_digit_year_flagged():
     assert any("2-digit year" in w for w in act.warnings)
 
 
-def test_inferred_date_flagged():
+def test_calculated_date_flagged():
     act = Act.model_validate(
         {
             "type": "death",
             "date": {
-                "raw": "aujourd'hui",
+                "raw": "la veille",
                 "iso": "1800-01-01",
                 "confidence": 0.8,
-                "inferred": True,
+                "qualifier": "calculated",
+                "note": "deduced from 'décédé la veille'",
             },
             "persons": [{"role": "subject"}],
         }
     )
     validate(act)
-    assert any("inferred" in w for w in act.warnings)
+    assert any("calculated" in w for w in act.warnings)
+
+
+def test_non_exact_date_without_note_flagged():
+    act = Act.model_validate(
+        {
+            "type": "death",
+            "date": {"raw": "vers 1800", "iso": "1800", "confidence": 0.6, "qualifier": "about"},
+            "persons": [{"role": "subject"}],
+        }
+    )
+    validate(act)
+    assert any("no explanatory note" in w for w in act.warnings)
 
 
 def test_low_confidence_flagged():

@@ -13,11 +13,14 @@ from tabellio.errors import (
     SchemaMismatch,
     TabellioError,
 )
+from tabellio.gedcom import to_gedcom
 from tabellio.schema import (
     Act,
     ActSummary,
     ActType,
+    Calendar,
     Cited,
+    DateQualifier,
     GenDate,
     Note,
     Person,
@@ -31,7 +34,9 @@ __all__ = [
     "Act",
     "ActSummary",
     "ActType",
+    "Calendar",
     "Cited",
+    "DateQualifier",
     "GenDate",
     "ImageError",
     "Note",
@@ -44,4 +49,5 @@ __all__ = [
     "TabellioError",
     "__version__",
     "parse",
+    "to_gedcom",
 ]

@@ -26,6 +26,9 @@ Rules:
   diacritics, ligatures, scribal abbreviations.
 - You may expand a clear abbreviation in `value` (e.g. "Jo~es" -> "Joannes") but
   never beyond what the abbreviation stands for.
+- Split a nobiliary/toponymic particle ("de", "van", "von", "du") into
+  `name_particle` and a generational suffix ("fils", "junior", "II") into
+  `name_suffix`; the core family name goes in `surname`.
 - Never invent a name, date, place or fact that is not legible in the image.
 - For each transcribed field give a `confidence` between 0 and 1.
 - Keep the act's own date (`date`: the baptism / burial / marriage ceremony or
@@ -35,8 +38,13 @@ Rules:
   morning", "hier", "aujourd'hui a six heures"). For a death or burial, do the
   same with `persons[subject].death_date` / `death_place`. These are often on a
   different day from the act itself.
-- A date deduced (from a stated age, "la veille", "hier"...) must have
-  `inferred: true` and a `note` explaining the deduction.
+- Every date has a `qualifier`: "exact" (given in full), "about", "before",
+  "after", "between" (put both bounds in `note`), or "calculated" (deduced from
+  an age or from "la veille" / "hier" ...). Any value other than "exact" needs a
+  `note`.
+- `calendar`: "gregorian" (default), "julian", or "french_republican" (French
+  acts of an II-XIV, 1793-1805). For a non-Gregorian date keep the wording in
+  `raw` and still give the proleptic-Gregorian equivalent in `iso` when you can.
 - If a field cannot be read, leave it null and add a short `note`. Do not guess.
 - `language`: the act's main language as an ISO 639-1 code ("fr", "la", "de"...).
 - `source_hint`: "parish" for religious registers, "civil" for state civil
@@ -81,8 +89,8 @@ _FULL_EXAMPLE = {
             "birth_date": {
                 "raw": "nee la veille",
                 "iso": "1703-05-11",
+                "qualifier": "calculated",
                 "confidence": 0.8,
-                "inferred": True,
                 "note": "act says 'nee la veille'; act dated 1703-05-12",
             },
         },

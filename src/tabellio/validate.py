@@ -6,7 +6,7 @@ to ``act.warnings`` so the caller can surface them.
 
 from __future__ import annotations
 
-from tabellio.schema import Act, ActType, GenDate, Role
+from tabellio.schema import Act, ActType, DateQualifier, GenDate, Role
 
 LOW_CONFIDENCE = 0.5
 
@@ -43,14 +43,20 @@ def _check_two_digit_year(d: GenDate | None, label: str, out: list[str]) -> None
         )
 
 
-def _check_inferred_dates(act: Act, out: list[str]) -> None:
-    if act.date.inferred:
-        out.append("act date is marked inferred, not stated on the record")
+def _check_date_qualifiers(act: Act, out: list[str]) -> None:
+    def check(d: GenDate | None, label: str) -> None:
+        if d is None or d.qualifier is DateQualifier.EXACT:
+            return
+        if d.qualifier is DateQualifier.CALCULATED:
+            out.append(f"{label} is calculated, not stated on the act")
+        if d.note is None:
+            out.append(f"{label} is '{d.qualifier}' but carries no explanatory note")
+
+    check(act.date, "act date")
     for p in act.persons:
-        for d, kind in ((p.birth_date, "birth"), (p.death_date, "death")):
-            if d is not None and d.inferred:
-                name = " ".join(filter(None, [_val(p.given), _val(p.surname)])) or p.role
-                out.append(f"{kind} date for {name} is inferred")
+        name = " ".join(filter(None, [_val(p.given), _val(p.surname)])) or p.role
+        check(p.birth_date, f"birth date for {name}")
+        check(p.death_date, f"death date for {name}")
 
 
 def _check_event_date_captured(act: Act, out: list[str]) -> None:
@@ -91,7 +97,7 @@ def validate(act: Act) -> Act:
     for p in act.persons:
         _check_two_digit_year(p.birth_date, f"{p.role} birth date", warnings)
         _check_two_digit_year(p.death_date, f"{p.role} death date", warnings)
-    _check_inferred_dates(act, warnings)
+    _check_date_qualifiers(act, warnings)
     _check_event_date_captured(act, warnings)
     _check_low_confidence(act, warnings)
     act.warnings = warnings

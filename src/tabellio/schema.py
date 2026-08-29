@@ -48,6 +48,25 @@ class SourceHint(StrEnum):
     UNKNOWN = "unknown"
 
 
+class DateQualifier(StrEnum):
+    """How the date is known. Maps 1:1 to GEDCOM 7 date value types."""
+
+    EXACT = "exact"  # stated in full          -> GEDCOM: (no prefix)
+    ABOUT = "about"  # "environ", "vers"       -> ABT
+    BEFORE = "before"  # "avant"               -> BEF
+    AFTER = "after"  # "apres"                 -> AFT
+    BETWEEN = "between"  # bounds in `note`    -> BET x AND y
+    CALCULATED = "calculated"  # from age / "la veille" / "hier" -> CAL
+
+
+class Calendar(StrEnum):
+    """Calendar the raw date is written in."""
+
+    GREGORIAN = "gregorian"
+    JULIAN = "julian"  # GEDCOM: @#DJULIAN@
+    FRENCH_REPUBLICAN = "french_republican"  # French acts an II-XIV; GEDCOM: @#DFRENCH R@
+
+
 class Cited(BaseModel, Generic[T]):
     """A single transcribed value plus its provenance.
 
@@ -72,13 +91,17 @@ class GenDate(BaseModel):
     raw: str | None = None
     iso: str | None = Field(
         default=None,
-        description="Best-effort YYYY-MM-DD (or YYYY-MM / YYYY). None if not resolvable.",
+        description=(
+            "Best-effort proleptic-Gregorian YYYY-MM-DD (or YYYY-MM / YYYY). "
+            "None if not resolvable."
+        ),
     )
+    qualifier: DateQualifier = Field(
+        default=DateQualifier.EXACT,
+        description="How the date is known; anything other than 'exact' needs a `note`.",
+    )
+    calendar: Calendar = Calendar.GREGORIAN
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
-    inferred: bool = Field(
-        default=False,
-        description="True when the date is deduced (e.g. from age) rather than stated.",
-    )
     note: str | None = None
 
 
@@ -88,6 +111,12 @@ class Person(BaseModel):
     role: Role
     given: Cited[str] | None = None
     surname: Cited[str] | None = None
+    name_particle: Cited[str] | None = Field(
+        default=None, description="Nobiliary/toponymic particle: 'de', 'van', 'von' (GEDCOM SPFX)."
+    )
+    name_suffix: Cited[str] | None = Field(
+        default=None, description="Generational suffix: 'fils', 'junior', 'II' (GEDCOM NSFX)."
+    )
     sex: Cited[str] | None = None
     age: Cited[str] | None = None
     occupation: Cited[str] | None = None

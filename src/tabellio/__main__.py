@@ -12,9 +12,10 @@ import sys
 
 from loguru import logger
 
-from tabellio import parse
+from tabellio import parse, to_gedcom
 from tabellio.errors import TabellioError
 from tabellio.providers import available_providers
+from tabellio.schema import Act
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -49,6 +50,12 @@ def main(argv: list[str] | None = None) -> int:
         choices=["full", "simple"],
         help="full: rich Act with confidence/notes/warnings; simple: bare summary",
     )
+    ap.add_argument(
+        "--format",
+        default="json",
+        choices=["json", "gedcom"],
+        help="json (default) or a GEDCOM 7 document (implies --output full)",
+    )
     ap.add_argument("--no-validate", action="store_true", help="skip consistency rules (full only)")
     ap.add_argument("-v", "--verbose", action="store_true", help="show debug logs")
     args = ap.parse_args(argv)
@@ -56,6 +63,7 @@ def main(argv: list[str] | None = None) -> int:
     logger.remove()
     logger.add(sys.stderr, level="DEBUG" if args.verbose else "WARNING")
 
+    output_mode = "full" if args.format == "gedcom" else args.output
     try:
         act = parse(
             args.image,
@@ -63,14 +71,17 @@ def main(argv: list[str] | None = None) -> int:
             model=args.model,
             act_type_hint=args.hint,
             act_language_hint=args.lang,
-            output_mode=args.output,
+            output_mode=output_mode,
             validate=not args.no_validate,
         )
     except TabellioError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
-    print(act.model_dump_json(indent=2, exclude_none=True))
+    if args.format == "gedcom" and isinstance(act, Act):
+        print(to_gedcom(act), end="")
+    else:
+        print(act.model_dump_json(indent=2, exclude_none=True))
     warnings = getattr(act, "warnings", [])
     if warnings:
         print(f"\n{len(warnings)} warning(s):", file=sys.stderr)
