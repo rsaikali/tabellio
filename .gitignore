@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# venv / tooling
+.venv/
+.python-version
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# env
+.env
+
+# editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# code-review graph (local only)
+.code-review-graph/
+
+# claude code local overrides
+.claude/settings.local.json
