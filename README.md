@@ -74,7 +74,7 @@ override the env vars.
 
 | `provider=` | Extra | Default model |
 |---|---|---|
-| `gemini` | `tabellio[gemini]` | `gemini-2.0-flash` |
+| `gemini` | `tabellio[gemini]` | `gemini-3.6-flash` |
 | `openai` | `tabellio[openai]` | `gpt-4o` |
 | `nim` | `tabellio[nim]` | `meta/llama-3.2-90b-vision-instruct` |
 | `anthropic` | `tabellio[anthropic]` | `claude-sonnet-4` |

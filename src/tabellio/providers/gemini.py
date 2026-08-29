@@ -7,7 +7,7 @@ from google.genai import types
 
 from tabellio.errors import ProviderError
 
-DEFAULT_MODEL = "gemini-2.0-flash"
+DEFAULT_MODEL = "gemini-3.6-flash"
 
 
 class GeminiProvider:
@@ -41,6 +41,8 @@ class GeminiProvider:
                     system_instruction=system_prompt,
                     response_mime_type="application/json",
                     temperature=0,
+                    # No tools are passed; disabling AFC silences the SDK warning.
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
                 ),
             )
         except Exception as exc:
