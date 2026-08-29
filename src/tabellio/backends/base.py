@@ -14,6 +14,8 @@ from tabellio.errors import BackendNotAvailable
 @runtime_checkable
 class Backend(Protocol):
     name: str
+    #: Environment variables checked, in order, when ``api_key`` is not passed.
+    env_vars: tuple[str, ...]
 
     def extract(
         self,
@@ -37,6 +39,17 @@ _REGISTRY: dict[str, str] = {
     "nim": "tabellio.backends.nim:NIMBackend",
     "anthropic": "tabellio.backends.anthropic:AnthropicBackend",
     "ollama": "tabellio.backends.ollama:OllamaBackend",
+}
+
+
+#: Which environment variables hold the key for each backend, checked in order.
+#: ``TABELLIO_API_KEY`` is always tried first (see ``tabellio.core``).
+ENV_VARS: dict[str, tuple[str, ...]] = {
+    "gemini": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
+    "openai": ("OPENAI_API_KEY",),
+    "nim": ("NVIDIA_API_KEY", "NVIDIA_NIM_API_KEY"),
+    "anthropic": ("ANTHROPIC_API_KEY",),
+    "ollama": (),
 }
 
 

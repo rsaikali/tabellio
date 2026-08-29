@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import json
+import os
 
 from loguru import logger
 from pydantic import ValidationError as PydanticValidationError
 
 from tabellio import prompt as _prompt
 from tabellio.backends import get_backend
+from tabellio.backends.base import ENV_VARS
 from tabellio.errors import SchemaMismatch
 from tabellio.image import ImageInput, load_image
 from tabellio.schema import Act
@@ -22,6 +24,17 @@ def _strip_fences(text: str) -> str:
         if t.rstrip().endswith("```"):
             t = t.rstrip()[:-3]
     return t.strip()
+
+
+def _resolve_api_key(explicit: str | None, backend: str) -> str | None:
+    """BYOK precedence: explicit arg > TABELLIO_API_KEY > provider-specific env var."""
+    if explicit:
+        return explicit
+    for var in ("TABELLIO_API_KEY", *ENV_VARS.get(backend, ())):
+        value = os.environ.get(var)
+        if value:
+            return value
+    return None
 
 
 def parse(
@@ -44,7 +57,10 @@ def parse(
         ``"gemini" | "openai" | "nim" | "anthropic" | "ollama"``.
     api_key:
         The caller's own provider key (BYOK). Never stored, never logged.
-        Not required for ``ollama``.
+        If omitted, falls back to ``$TABELLIO_API_KEY`` then the provider's
+        own env var (``$GEMINI_API_KEY``, ``$OPENAI_API_KEY``,
+        ``$NVIDIA_API_KEY``, ``$ANTHROPIC_API_KEY``). Not required for
+        ``ollama``.
     act_type_hint:
         Optional caller guess (``"birth"``, ``"marriage"``...). The model still
         verifies it against the image.
@@ -55,6 +71,7 @@ def parse(
     """
     data, mime = load_image(image)
     impl = get_backend(backend)
+    api_key = _resolve_api_key(api_key, backend)
     logger.debug(
         "tabellio.parse backend={} model={} bytes={} mime={} prompt_v={}",
         backend,

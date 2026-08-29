@@ -45,6 +45,23 @@ print(act.warnings)  # consistency + low-confidence flags
 `parse()` returns an [`Act`](src/tabellio/schema.py) Pydantic model. Unread
 fields are `null` with a note — never guessed.
 
+### API key
+
+Pass `api_key=` explicitly, or omit it and let it fall back to the environment,
+in this order: `$TABELLIO_API_KEY`, then the provider's own variable
+(`$GEMINI_API_KEY` / `$GOOGLE_API_KEY`, `$OPENAI_API_KEY`, `$NVIDIA_API_KEY`,
+`$ANTHROPIC_API_KEY`). The key is never logged and never stored.
+
+### Command line
+
+```bash
+export GEMINI_API_KEY=...           # in your shell
+python -m tabellio data/act.jpg --backend gemini [--hint baptism] [-v]
+```
+
+Prints the `Act` as JSON on stdout, warnings on stderr. The key is only read
+from the environment — never a CLI argument.
+
 ## Backends
 
 | `backend=` | Extra | Default model | Key parameter |

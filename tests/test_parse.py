@@ -18,6 +18,31 @@ def test_parse_happy_path(png_bytes, fictional_act, fake_backend):
     assert be.calls[0]["api_key"] == "k"
 
 
+def test_parse_reads_key_from_env(png_bytes, fictional_act, fake_backend, monkeypatch):
+    monkeypatch.delenv("TABELLIO_API_KEY", raising=False)
+    monkeypatch.setenv("GEMINI_API_KEY", "from-env")
+    be = fake_backend(json.dumps(fictional_act))
+    parse(png_bytes, backend="gemini")
+    assert be.calls[0]["api_key"] == "from-env"
+
+
+def test_parse_explicit_key_beats_env(png_bytes, fictional_act, fake_backend, monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "from-env")
+    be = fake_backend(json.dumps(fictional_act))
+    parse(png_bytes, backend="gemini", api_key="explicit")
+    assert be.calls[0]["api_key"] == "explicit"
+
+
+def test_parse_tabellio_api_key_wins_over_provider_var(
+    png_bytes, fictional_act, fake_backend, monkeypatch
+):
+    monkeypatch.setenv("TABELLIO_API_KEY", "generic")
+    monkeypatch.setenv("GEMINI_API_KEY", "provider")
+    be = fake_backend(json.dumps(fictional_act))
+    parse(png_bytes, backend="gemini")
+    assert be.calls[0]["api_key"] == "generic"
+
+
 def test_parse_strips_markdown_fences(png_bytes, fictional_act, fake_backend):
     fake_backend("```json\n" + json.dumps(fictional_act) + "\n```")
     act = parse(png_bytes, backend="fake", api_key="k")
