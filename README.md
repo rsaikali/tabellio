@@ -45,6 +45,19 @@ print(act.warnings)  # consistency + low-confidence flags
 `parse()` returns an [`Act`](src/tabellio/schema.py) Pydantic model. Unread
 fields are `null` with a note — never guessed.
 
+### Output modes
+
+```python
+act = tabellio.parse("register-page.jpg", output_mode="simple")
+# ActSummary: type, date, location, persons[{role, given, surname}] — nothing else
+```
+
+- `output_mode="full"` (default) — rich `Act`: raw spelling, per-field
+  `confidence`, inference flags, validation `warnings`.
+- `output_mode="simple"` — sends a shorter prompt, returns a bare `ActSummary`:
+  `type`, `date` (ISO string or `null`), `location`, `persons`. No confidence,
+  no raw, no inference, no notes. Fewer tokens in and out.
+
 ### Configuration
 
 Three optional environment variables, each a fallback for the matching
@@ -63,12 +76,12 @@ The key is never logged and never stored.
 ```bash
 export TABELLIO_PROVIDER=gemini
 export TABELLIO_KEY=...              # in your shell
-python -m tabellio data/act.jpg [--hint baptism] [-v]
+python -m tabellio data/act.jpg [--hint baptism] [--output simple] [-v]
 ```
 
-Prints the `Act` as JSON on stdout, warnings on stderr. The key is only read
-from the environment — never a CLI argument. `--provider` and `--model`
-override the env vars.
+Prints the act as JSON on stdout, warnings on stderr. The key is only read
+from the environment — never a CLI argument. `--provider`, `--model` and
+`--output` override the defaults.
 
 ## Providers
 

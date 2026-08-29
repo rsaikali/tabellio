@@ -18,6 +18,11 @@ coverage.xml
 # env
 .env
 
+# local manual-test scripts and their output (may contain keys / real data)
+/test_*.sh
+/test_*.out
+/scratch/
+
 # editors / OS
 .DS_Store
 .idea/

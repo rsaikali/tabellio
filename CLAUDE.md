@@ -54,7 +54,7 @@ Decision chain, in the order it was settled:
 | API key | **BYOK** — supplied by the caller, never stored, never logged. |
 | Config | Three env vars, each a fallback for a `parse()` arg (explicit arg wins): `TABELLIO_PROVIDER`, `TABELLIO_KEY`, `TABELLIO_MODEL`. Nothing else read from the environment. |
 | Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. |
-| Output | JSON validated by a **Pydantic** schema. |
+| Output | JSON validated by a **Pydantic** schema. `output_mode="full"` (default) -> `Act`; `output_mode="simple"` -> `ActSummary` (type/date/location/persons only), via a shorter prompt + its own schema. |
 | Ambiguity | No silent resolution: keep the original spelling, flag inferred dates, `confidence`. |
 | Storage | **None.** No database, no disk cache of user content. |
 | Accounts / billing | **None.** Permanently out of scope for the library. |
@@ -72,6 +72,11 @@ An extracted act yields at least:
 - `source_hint`: guessed register type (parish vs civil registry) from the date
 - unread fields → absent or `null` + note, **never guessed**
 
+`output_mode="simple"` yields only `type`, `date` (ISO string or `null`),
+`location`, `persons[{role, given, surname}]` — no raw, confidence, inference,
+notes, warnings. Separate prompt (`_SIMPLE_SYSTEM`) + schema (`ActSummary`), not
+a projection of `Act`.
+
 The exact schema lives in code (`tabellio/schema.py` or similar), not here —
 this table is intent only.
 
@@ -79,7 +84,8 @@ this table is intent only.
 
 ```
 tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
-               api_key=..., model=None, act_type_hint=None) -> Act   # Pydantic
+               api_key=..., model=None, act_type_hint=None,
+               output_mode="full"|"simple") -> Act | ActSummary   # Pydantic
 ```
 
 `provider` / `api_key` / `model` fall back to `TABELLIO_PROVIDER` /
@@ -91,7 +97,9 @@ tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
 - `src/tabellio/schema.py`: Pydantic models (`Act`, `Person`, `GenDate`…).
 - `src/tabellio/validate.py`: post-extraction rules (date/role consistency, 2-digit years,
   `confidence`).
-- `src/tabellio/prompt.py`: the extraction prompt + few-shot, versioned.
+- `src/tabellio/prompt.py`: the extraction prompts + few-shot, versioned. One
+  `PROMPT_VERSION` covers both modes; `system_prompt` / `few_shot` /
+  `user_prompt` take `output_mode`.
 - `python -m tabellio <image>` exists (`__main__.py`): thin CLI, config from
   the env vars, `--provider` / `--model` / `--hint` / `-v` overrides.
 

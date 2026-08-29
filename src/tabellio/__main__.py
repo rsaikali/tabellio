@@ -37,7 +37,13 @@ def main(argv: list[str] | None = None) -> int:
         choices=["birth", "baptism", "marriage", "death", "burial"],
         help="act type hint (still verified against the image)",
     )
-    ap.add_argument("--no-validate", action="store_true", help="skip consistency rules")
+    ap.add_argument(
+        "--output",
+        default="full",
+        choices=["full", "simple"],
+        help="full: rich Act with confidence/notes/warnings; simple: bare summary",
+    )
+    ap.add_argument("--no-validate", action="store_true", help="skip consistency rules (full only)")
     ap.add_argument("-v", "--verbose", action="store_true", help="show debug logs")
     args = ap.parse_args(argv)
 
@@ -50,6 +56,7 @@ def main(argv: list[str] | None = None) -> int:
             provider=args.provider,
             model=args.model,
             act_type_hint=args.hint,
+            output_mode=args.output,
             validate=not args.no_validate,
         )
     except TabellioError as exc:
@@ -57,9 +64,10 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     print(act.model_dump_json(indent=2, exclude_none=True))
-    if act.warnings:
-        print(f"\n{len(act.warnings)} warning(s):", file=sys.stderr)
-        for w in act.warnings:
+    warnings = getattr(act, "warnings", [])
+    if warnings:
+        print(f"\n{len(warnings)} warning(s):", file=sys.stderr)
+        for w in warnings:
             print(f"  - {w}", file=sys.stderr)
     return 0
 

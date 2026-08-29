@@ -128,3 +128,29 @@ class Act(BaseModel):
         default_factory=list,
         description="Filled by tabellio.validate -- consistency and low-confidence flags.",
     )
+
+
+# --- output_mode="simple" -------------------------------------------------------
+# A deliberately bare projection: identity fields only. No raw spelling, no
+# confidence, no inference flags, no notes, no warnings. Produced by a shorter
+# prompt against its own schema, not derived from Act.
+
+
+class PersonSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    role: Role
+    given: str | None = None
+    surname: str | None = None
+
+
+class ActSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    type: ActType
+    date: str | None = Field(
+        default=None,
+        description="ISO YYYY-MM-DD (or YYYY-MM / YYYY), else null. No raw spelling.",
+    )
+    location: str | None = None
+    persons: list[PersonSummary] = Field(default_factory=list)

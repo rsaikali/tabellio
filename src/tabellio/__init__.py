@@ -13,18 +13,30 @@ from tabellio.errors import (
     SchemaMismatch,
     TabellioError,
 )
-from tabellio.schema import Act, ActType, Cited, GenDate, Note, Person, Role
+from tabellio.schema import (
+    Act,
+    ActSummary,
+    ActType,
+    Cited,
+    GenDate,
+    Note,
+    Person,
+    PersonSummary,
+    Role,
+)
 
 __version__ = "0.0.1"
 
 __all__ = [
     "Act",
+    "ActSummary",
     "ActType",
     "Cited",
     "GenDate",
     "ImageError",
     "Note",
     "Person",
+    "PersonSummary",
     "ProviderError",
     "ProviderNotAvailable",
     "Role",

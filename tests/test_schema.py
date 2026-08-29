@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from tabellio.schema import Act, Cited, Person, Role
+from tabellio.schema import Act, ActSummary, Cited, Person, Role
 
 
 def test_act_roundtrip(fictional_act):
@@ -35,3 +35,16 @@ def test_defaults(fictional_act):
     act = Act.model_validate(fictional_act)
     assert act.warnings == []
     assert act.prompt_version is None
+
+
+def test_act_summary(fictional_summary):
+    s = ActSummary.model_validate(fictional_summary)
+    assert s.type == "death"
+    assert s.date == "1812-01-03"
+    assert s.persons[0].role is Role.SUBJECT
+    assert set(s.model_dump()) == {"type", "date", "location", "persons"}
+
+
+def test_act_summary_forbids_full_fields():
+    with pytest.raises(ValidationError):
+        ActSummary.model_validate({"type": "birth", "date": {"raw": "x"}})

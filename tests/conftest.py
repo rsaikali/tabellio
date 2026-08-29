@@ -29,6 +29,16 @@ FICTIONAL_ACT = {
 }
 
 
+FICTIONAL_SUMMARY = {
+    "type": "death",
+    "date": "1812-01-03",
+    "location": "Bourg-Fictif",
+    "persons": [
+        {"role": "subject", "given": "Anonyme", "surname": "Untel"},
+    ],
+}
+
+
 @pytest.fixture(autouse=True)
 def _clear_tabellio_env(monkeypatch):
     """Isolate every test from the developer's own TABELLIO_* environment."""
@@ -44,6 +54,11 @@ def png_bytes() -> bytes:
 @pytest.fixture
 def fictional_act() -> dict:
     return dict(FICTIONAL_ACT)
+
+
+@pytest.fixture
+def fictional_summary() -> dict:
+    return dict(FICTIONAL_SUMMARY)
 
 
 class FakeProvider:
