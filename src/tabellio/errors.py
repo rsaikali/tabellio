@@ -11,11 +11,11 @@ class ImageError(TabellioError):
     """The supplied image could not be read or its format is unsupported."""
 
 
-class BackendNotAvailable(TabellioError):
-    """A backend was requested but its optional SDK is not installed."""
+class ProviderNotAvailable(TabellioError):
+    """A provider was requested but its optional SDK is not installed."""
 
 
-class BackendError(TabellioError):
+class ProviderError(TabellioError):
     """The provider call failed or returned an unusable response."""
 
 

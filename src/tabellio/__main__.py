@@ -1,7 +1,8 @@
 """``python -m tabellio <image>`` -- quick manual check against one record.
 
-The API key is read from the environment (see ``tabellio.parse``); it is never
-taken as a CLI argument so it cannot land in shell history.
+Configuration comes from the environment (see ``tabellio.parse``):
+``TABELLIO_PROVIDER``, ``TABELLIO_KEY``, ``TABELLIO_MODEL``. The key is never a
+CLI argument, so it cannot land in shell history.
 """
 
 from __future__ import annotations
@@ -12,15 +13,24 @@ import sys
 from loguru import logger
 
 from tabellio import parse
-from tabellio.backends import available_backends
 from tabellio.errors import TabellioError
+from tabellio.providers import available_providers
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m tabellio")
     ap.add_argument("image", help="path to an image of a single record")
-    ap.add_argument("--backend", default="gemini", choices=available_backends())
-    ap.add_argument("--model", default=None, help="override the backend default model")
+    ap.add_argument(
+        "--provider",
+        default=None,
+        choices=available_providers(),
+        help="override $TABELLIO_PROVIDER (default: gemini)",
+    )
+    ap.add_argument(
+        "--model",
+        default=None,
+        help="override $TABELLIO_MODEL / the provider default",
+    )
     ap.add_argument(
         "--hint",
         default=None,
@@ -37,9 +47,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         act = parse(
             args.image,
-            backend=args.backend,
-            act_type_hint=args.hint,
+            provider=args.provider,
             model=args.model,
+            act_type_hint=args.hint,
             validate=not args.no_validate,
         )
     except TabellioError as exc:

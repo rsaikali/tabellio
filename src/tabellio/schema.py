@@ -123,7 +123,7 @@ class Act(BaseModel):
     other: list[Note] = Field(default_factory=list)
     source_hint: SourceHint = SourceHint.UNKNOWN
     prompt_version: str | None = None
-    backend: str | None = None
+    provider: str | None = None
     warnings: list[str] = Field(
         default_factory=list,
         description="Filled by tabellio.validate -- consistency and low-confidence flags.",

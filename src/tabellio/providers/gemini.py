@@ -1,16 +1,16 @@
-"""Google Gemini backend (``pip install 'tabellio[gemini]'``)."""
+"""Google Gemini provider (``pip install 'tabellio[gemini]'``)."""
 
 from __future__ import annotations
 
 from google import genai
 from google.genai import types
 
-from tabellio.errors import BackendError
+from tabellio.errors import ProviderError
 
 DEFAULT_MODEL = "gemini-2.0-flash"
 
 
-class GeminiBackend:
+class GeminiProvider:
     name = "gemini"
 
     def extract(
@@ -26,7 +26,7 @@ class GeminiBackend:
         **options: object,
     ) -> str:
         if not api_key:
-            raise BackendError("gemini backend requires api_key (BYOK)")
+            raise ProviderError("gemini provider requires an API key (BYOK)")
         client = genai.Client(api_key=api_key)
         contents = [types.Part.from_text(text=m["content"]) for m in few_shot]
         contents += [
@@ -44,8 +44,8 @@ class GeminiBackend:
                 ),
             )
         except Exception as exc:
-            raise BackendError(f"gemini call failed: {exc}") from exc
+            raise ProviderError(f"gemini call failed: {exc}") from exc
         text = resp.text
         if not text:
-            raise BackendError("gemini returned an empty response")
+            raise ProviderError("gemini returned an empty response")
         return text

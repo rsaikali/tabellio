@@ -1,17 +1,17 @@
-"""OpenAI backend (``pip install 'tabellio[openai]'``)."""
+"""OpenAI provider (``pip install 'tabellio[openai]'``)."""
 
 from __future__ import annotations
 
 from openai import OpenAI
 
-from tabellio.errors import BackendError
+from tabellio.errors import ProviderError
 from tabellio.image import to_data_url
 
 DEFAULT_MODEL = "gpt-4o"
 DEFAULT_BASE_URL: str | None = None
 
 
-class OpenAIBackend:
+class OpenAIProvider:
     name = "openai"
 
     def extract(
@@ -28,7 +28,7 @@ class OpenAIBackend:
         **options: object,
     ) -> str:
         if not api_key:
-            raise BackendError(f"{self.name} backend requires api_key (BYOK)")
+            raise ProviderError(f"{self.name} provider requires an API key (BYOK)")
         client = OpenAI(api_key=api_key, base_url=base_url or DEFAULT_BASE_URL)
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
         messages += [{"role": m["role"], "content": m["content"]} for m in few_shot]
@@ -49,8 +49,8 @@ class OpenAIBackend:
                 response_format={"type": "json_object"},
             )
         except Exception as exc:
-            raise BackendError(f"{self.name} call failed: {exc}") from exc
+            raise ProviderError(f"{self.name} call failed: {exc}") from exc
         text = resp.choices[0].message.content if resp.choices else None
         if not text:
-            raise BackendError(f"{self.name} returned an empty response")
+            raise ProviderError(f"{self.name} returned an empty response")
         return text

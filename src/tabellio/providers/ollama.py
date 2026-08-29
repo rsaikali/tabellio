@@ -1,6 +1,6 @@
-"""Ollama backend for a local VLM (``pip install 'tabellio[ollama]'``).
+"""Ollama provider for a local VLM (``pip install 'tabellio[ollama]'``).
 
-Optional and local -- no api_key needed. Reliability caveat from CLAUDE.md
+Optional and local -- no API key needed. Reliability caveat from CLAUDE.md
 applies: local general-purpose VLMs hallucinate on old cursive.
 """
 
@@ -8,13 +8,13 @@ from __future__ import annotations
 
 from ollama import Client
 
-from tabellio.errors import BackendError
+from tabellio.errors import ProviderError
 
 DEFAULT_MODEL = "llama3.2-vision"
 DEFAULT_HOST = "http://localhost:11434"
 
 
-class OllamaBackend:
+class OllamaProvider:
     name = "ollama"
 
     def extract(
@@ -42,8 +42,8 @@ class OllamaBackend:
                 options={"temperature": 0},
             )
         except Exception as exc:
-            raise BackendError(f"ollama call failed: {exc}") from exc
+            raise ProviderError(f"ollama call failed: {exc}") from exc
         text = (resp.get("message") or {}).get("content", "").strip()
         if not text:
-            raise BackendError("ollama returned an empty response")
+            raise ProviderError("ollama returned an empty response")
         return text

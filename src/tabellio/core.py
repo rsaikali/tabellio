@@ -9,12 +9,17 @@ from loguru import logger
 from pydantic import ValidationError as PydanticValidationError
 
 from tabellio import prompt as _prompt
-from tabellio.backends import get_backend
-from tabellio.backends.base import ENV_VARS
 from tabellio.errors import SchemaMismatch
 from tabellio.image import ImageInput, load_image
+from tabellio.providers import DEFAULT_PROVIDER, get_provider
 from tabellio.schema import Act
 from tabellio.validate import validate as _validate
+
+#: The only three environment variables tabellio itself reads. Each is a
+#: fallback for the matching ``parse()`` argument; an explicit argument wins.
+ENV_PROVIDER = "TABELLIO_PROVIDER"
+ENV_KEY = "TABELLIO_KEY"
+ENV_MODEL = "TABELLIO_MODEL"
 
 
 def _strip_fences(text: str) -> str:
@@ -26,26 +31,21 @@ def _strip_fences(text: str) -> str:
     return t.strip()
 
 
-def _resolve_api_key(explicit: str | None, backend: str) -> str | None:
-    """BYOK precedence: explicit arg > TABELLIO_API_KEY > provider-specific env var."""
+def _pick(explicit: str | None, env_var: str, default: str | None = None) -> str | None:
     if explicit:
         return explicit
-    for var in ("TABELLIO_API_KEY", *ENV_VARS.get(backend, ())):
-        value = os.environ.get(var)
-        if value:
-            return value
-    return None
+    return os.environ.get(env_var) or default
 
 
 def parse(
     image: ImageInput,
     *,
-    backend: str = "gemini",
+    provider: str | None = None,
     api_key: str | None = None,
-    act_type_hint: str | None = None,
     model: str | None = None,
+    act_type_hint: str | None = None,
     validate: bool = True,
-    **backend_options: object,
+    **provider_options: object,
 ) -> Act:
     """Extract a structured :class:`Act` from an image of a single record.
 
@@ -53,28 +53,30 @@ def parse(
     ----------
     image:
         Path, bytes or file-like object. jpeg / png / tiff / webp.
-    backend:
-        ``"gemini" | "openai" | "nim" | "anthropic" | "ollama"``.
+    provider:
+        ``"gemini" | "openai" | "nim" | "anthropic" | "ollama"``. Falls back to
+        ``$TABELLIO_PROVIDER``, then ``"gemini"``.
     api_key:
-        The caller's own provider key (BYOK). Never stored, never logged.
-        If omitted, falls back to ``$TABELLIO_API_KEY`` then the provider's
-        own env var (``$GEMINI_API_KEY``, ``$OPENAI_API_KEY``,
-        ``$NVIDIA_API_KEY``, ``$ANTHROPIC_API_KEY``). Not required for
-        ``ollama``.
+        The caller's own provider key (BYOK). Never stored, never logged. Falls
+        back to ``$TABELLIO_KEY``. Not required for ``ollama``.
+    model:
+        Override the provider's default model id. Falls back to
+        ``$TABELLIO_MODEL``.
     act_type_hint:
         Optional caller guess (``"birth"``, ``"marriage"``...). The model still
         verifies it against the image.
-    model:
-        Override the backend's default model id.
     validate:
         Run :mod:`tabellio.validate` consistency rules and fill ``act.warnings``.
     """
+    provider = _pick(provider, ENV_PROVIDER, DEFAULT_PROVIDER)
+    api_key = _pick(api_key, ENV_KEY)
+    model = _pick(model, ENV_MODEL)
+
     data, mime = load_image(image)
-    impl = get_backend(backend)
-    api_key = _resolve_api_key(api_key, backend)
+    impl = get_provider(provider)
     logger.debug(
-        "tabellio.parse backend={} model={} bytes={} mime={} prompt_v={}",
-        backend,
+        "tabellio.parse provider={} model={} bytes={} mime={} prompt_v={}",
+        provider,
         model or "<default>",
         len(data),
         mime,
@@ -89,21 +91,21 @@ def parse(
         user_prompt=_prompt.user_prompt(act_type_hint),
         api_key=api_key,
         model=model,
-        **backend_options,
+        **provider_options,
     )
 
     try:
         payload = json.loads(_strip_fences(raw))
     except json.JSONDecodeError as exc:
-        raise SchemaMismatch(f"backend {backend!r} did not return JSON: {exc}", raw=raw) from exc
+        raise SchemaMismatch(f"provider {provider!r} did not return JSON: {exc}", raw=raw) from exc
 
     try:
         act = Act.model_validate(payload)
     except PydanticValidationError as exc:
         raise SchemaMismatch(
-            f"backend {backend!r} output failed schema validation:\n{exc}", raw=payload
+            f"provider {provider!r} output failed schema validation:\n{exc}", raw=payload
         ) from exc
 
     act.prompt_version = _prompt.PROMPT_VERSION
-    act.backend = backend
+    act.provider = provider
     return _validate(act) if validate else act

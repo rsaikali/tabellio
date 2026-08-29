@@ -1,14 +1,14 @@
-"""NVIDIA NIM backend -- OpenAI-compatible endpoint (``pip install 'tabellio[nim]'``)."""
+"""NVIDIA NIM provider -- OpenAI-compatible endpoint (``pip install 'tabellio[nim]'``)."""
 
 from __future__ import annotations
 
-from tabellio.backends.openai import OpenAIBackend
+from tabellio.providers.openai import OpenAIProvider
 
 DEFAULT_MODEL = "meta/llama-3.2-90b-vision-instruct"
 DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1"
 
 
-class NIMBackend(OpenAIBackend):
+class NIMProvider(OpenAIProvider):
     name = "nim"
 
     def extract(

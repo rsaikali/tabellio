@@ -39,7 +39,7 @@ Decision chain, in the order it was settled:
    provider, so this library's code sees neither — no processing liability.
 5. **So: a library**, plus (later) a static BYOK demo page as a showcase
    artifact.
-6. **Provider-agnostic.** NIM is one backend among several.
+6. **Provider-agnostic.** NIM is one provider among several.
    Gemini Flash reads acts better in practice; many people already have
    a Gemini/OpenAI/Anthropic key and no NIM key.
 
@@ -50,9 +50,10 @@ Decision chain, in the order it was settled:
 | Form | Published Python library (PyPI: `tabellio`) |
 | License | Permissive open source (MIT or Apache-2.0) |
 | Language | **English everywhere** (see top). User-facing conversation stays in his preferred language. |
-| Model | No embedded / trained model. Calls a third-party VLM via a backend. |
+| Model | No embedded / trained model. Calls a third-party VLM via a provider adapter. |
 | API key | **BYOK** — supplied by the caller, never stored, never logged. |
-| Backends | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. |
+| Config | Three env vars, each a fallback for a `parse()` arg (explicit arg wins): `TABELLIO_PROVIDER`, `TABELLIO_KEY`, `TABELLIO_MODEL`. Nothing else read from the environment. |
+| Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. |
 | Output | JSON validated by a **Pydantic** schema. |
 | Ambiguity | No silent resolution: keep the original spelling, flag inferred dates, `confidence`. |
 | Storage | **None.** No database, no disk cache of user content. |
@@ -77,18 +78,22 @@ this table is intent only.
 ## Target architecture
 
 ```
-tabellio.parse(image, backend="gemini"|"nim"|"openai"|"anthropic"|"ollama",
-               api_key=..., act_type_hint=None) -> Act   # Pydantic
+tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
+               api_key=..., model=None, act_type_hint=None) -> Act   # Pydantic
 ```
 
-- `src/tabellio/backends/`: one module per provider, common interface
-  `(image, prompt, schema) -> raw_json`. Lazy import of optional SDKs.
+`provider` / `api_key` / `model` fall back to `TABELLIO_PROVIDER` /
+`TABELLIO_KEY` / `TABELLIO_MODEL` when not passed.
+
+- `src/tabellio/providers/`: one module per provider, `registry.py` holds the
+  `Provider` protocol + lazy-import registry. Common interface
+  `(image, prompt, ...) -> raw_json`. Lazy import of optional SDKs.
 - `src/tabellio/schema.py`: Pydantic models (`Act`, `Person`, `GenDate`…).
 - `src/tabellio/validate.py`: post-extraction rules (date/role consistency, 2-digit years,
   `confidence`).
 - `src/tabellio/prompt.py`: the extraction prompt + few-shot, versioned.
-- No mandatory CLI at first; a simple `python -m tabellio <image>` can come
-  later.
+- `python -m tabellio <image>` exists (`__main__.py`): thin CLI, config from
+  the env vars, `--provider` / `--model` / `--hint` / `-v` overrides.
 
 ## Out of scope — refuse
 

@@ -1,4 +1,4 @@
-"""Anthropic backend (``pip install 'tabellio[anthropic]'``)."""
+"""Anthropic provider (``pip install 'tabellio[anthropic]'``)."""
 
 from __future__ import annotations
 
@@ -6,12 +6,12 @@ import base64
 
 import anthropic
 
-from tabellio.errors import BackendError
+from tabellio.errors import ProviderError
 
 DEFAULT_MODEL = "claude-sonnet-4-20250514"
 
 
-class AnthropicBackend:
+class AnthropicProvider:
     name = "anthropic"
 
     def extract(
@@ -28,7 +28,7 @@ class AnthropicBackend:
         **options: object,
     ) -> str:
         if not api_key:
-            raise BackendError("anthropic backend requires api_key (BYOK)")
+            raise ProviderError("anthropic provider requires an API key (BYOK)")
         client = anthropic.Anthropic(api_key=api_key)
         messages: list[dict] = [{"role": m["role"], "content": m["content"]} for m in few_shot]
         messages.append(
@@ -56,9 +56,9 @@ class AnthropicBackend:
                 temperature=0,
             )
         except Exception as exc:
-            raise BackendError(f"anthropic call failed: {exc}") from exc
+            raise ProviderError(f"anthropic call failed: {exc}") from exc
         parts = [b.text for b in resp.content if getattr(b, "type", None) == "text"]
         text = "".join(parts).strip()
         if not text:
-            raise BackendError("anthropic returned an empty response")
+            raise ProviderError("anthropic returned an empty response")
         return text

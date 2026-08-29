@@ -29,6 +29,13 @@ FICTIONAL_ACT = {
 }
 
 
+@pytest.fixture(autouse=True)
+def _clear_tabellio_env(monkeypatch):
+    """Isolate every test from the developer's own TABELLIO_* environment."""
+    for var in ("TABELLIO_PROVIDER", "TABELLIO_KEY", "TABELLIO_MODEL"):
+        monkeypatch.delenv(var, raising=False)
+
+
 @pytest.fixture
 def png_bytes() -> bytes:
     return PNG_1X1
@@ -39,8 +46,8 @@ def fictional_act() -> dict:
     return dict(FICTIONAL_ACT)
 
 
-class FakeBackend:
-    """Deterministic backend for tests -- returns whatever text it is given."""
+class FakeProvider:
+    """Deterministic provider for tests -- returns whatever text it is given."""
 
     name = "fake"
 
@@ -54,10 +61,10 @@ class FakeBackend:
 
 
 @pytest.fixture
-def fake_backend(monkeypatch):
-    def _install(response: str) -> FakeBackend:
-        be = FakeBackend(response)
-        monkeypatch.setattr("tabellio.core.get_backend", lambda name: be)
-        return be
+def fake_provider(monkeypatch):
+    def _install(response: str) -> FakeProvider:
+        impl = FakeProvider(response)
+        monkeypatch.setattr("tabellio.core.get_provider", lambda name: impl)
+        return impl
 
     return _install

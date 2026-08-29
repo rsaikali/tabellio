@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from tabellio.core import parse
 from tabellio.errors import (
-    BackendError,
-    BackendNotAvailable,
     ImageError,
+    ProviderError,
+    ProviderNotAvailable,
     SchemaMismatch,
     TabellioError,
 )
@@ -20,13 +20,13 @@ __version__ = "0.0.1"
 __all__ = [
     "Act",
     "ActType",
-    "BackendError",
-    "BackendNotAvailable",
     "Cited",
     "GenDate",
     "ImageError",
     "Note",
     "Person",
+    "ProviderError",
+    "ProviderNotAvailable",
     "Role",
     "SchemaMismatch",
     "TabellioError",

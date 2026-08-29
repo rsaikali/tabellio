@@ -29,7 +29,7 @@ import tabellio
 
 act = tabellio.parse(
     "register-page.jpg",
-    backend="gemini",
+    provider="gemini",
     api_key="...",  # your key, BYOK
     act_type_hint="baptism",  # optional
 )
@@ -45,44 +45,53 @@ print(act.warnings)  # consistency + low-confidence flags
 `parse()` returns an [`Act`](src/tabellio/schema.py) Pydantic model. Unread
 fields are `null` with a note — never guessed.
 
-### API key
+### Configuration
 
-Pass `api_key=` explicitly, or omit it and let it fall back to the environment,
-in this order: `$TABELLIO_API_KEY`, then the provider's own variable
-(`$GEMINI_API_KEY` / `$GOOGLE_API_KEY`, `$OPENAI_API_KEY`, `$NVIDIA_API_KEY`,
-`$ANTHROPIC_API_KEY`). The key is never logged and never stored.
+Three optional environment variables, each a fallback for the matching
+`parse()` argument. An explicit argument always wins.
+
+| Variable | Fills | Default |
+|---|---|---|
+| `TABELLIO_PROVIDER` | `provider=` | `gemini` |
+| `TABELLIO_KEY` | `api_key=` | — (required except `ollama`) |
+| `TABELLIO_MODEL` | `model=` | the provider's default |
+
+The key is never logged and never stored.
 
 ### Command line
 
 ```bash
-export GEMINI_API_KEY=...           # in your shell
-python -m tabellio data/act.jpg --backend gemini [--hint baptism] [-v]
+export TABELLIO_PROVIDER=gemini
+export TABELLIO_KEY=...              # in your shell
+python -m tabellio data/act.jpg [--hint baptism] [-v]
 ```
 
 Prints the `Act` as JSON on stdout, warnings on stderr. The key is only read
-from the environment — never a CLI argument.
+from the environment — never a CLI argument. `--provider` and `--model`
+override the env vars.
 
-## Backends
+## Providers
 
-| `backend=` | Extra | Default model | Key parameter |
-|---|---|---|---|
-| `gemini` | `tabellio[gemini]` | `gemini-2.0-flash` | `api_key` |
-| `openai` | `tabellio[openai]` | `gpt-4o` | `api_key` |
-| `nim` | `tabellio[nim]` | `llama-3.2-90b-vision-instruct` | `api_key` |
-| `anthropic` | `tabellio[anthropic]` | `claude-sonnet-4` | `api_key` |
-| `ollama` | `tabellio[ollama]` | `llama3.2-vision` | — (local) |
+| `provider=` | Extra | Default model |
+|---|---|---|
+| `gemini` | `tabellio[gemini]` | `gemini-2.0-flash` |
+| `openai` | `tabellio[openai]` | `gpt-4o` |
+| `nim` | `tabellio[nim]` | `meta/llama-3.2-90b-vision-instruct` |
+| `anthropic` | `tabellio[anthropic]` | `claude-sonnet-4` |
+| `ollama` | `tabellio[ollama]` | `llama3.2-vision` (local, no key) |
 
-Override with `model=` or backend-specific keyword options (`base_url=`,
-`host=`, ...).
+Set `TABELLIO_MODEL` (or pass `model=`) to switch model — quality vs speed is
+your call. Provider-specific keyword options pass straight through
+(`base_url=`, `host=`, `max_tokens=`, ...).
 
 > Local / general-purpose VLMs hallucinate plausible names and dates on old
-> cursive. The `ollama` backend exists for convenience and testing, not for
+> cursive. The `ollama` provider exists for convenience and testing, not for
 > production genealogy.
 
 ## Scope
 
 **In:** extraction of a single record to schema, ambiguity flags, confidence
-surfacing, multi-provider adapter.
+surfacing, provider-agnostic adapter.
 
 **Out:** embedded/trained model, home-grown HTR, storage, accounts, billing,
 GEDCOM import or writing into a tree, image segmentation / deskew, languages
