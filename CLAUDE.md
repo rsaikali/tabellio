@@ -53,7 +53,7 @@ Decision chain, in the order it was settled:
 | Model | No embedded / trained model. Calls a third-party VLM via a provider adapter. |
 | API key | **BYOK** — supplied by the caller, never stored, never logged. |
 | Config | Three env vars, each a fallback for a `parse()` arg (explicit arg wins): `TABELLIO_PROVIDER`, `TABELLIO_KEY`, `TABELLIO_MODEL`. Nothing else read from the environment. |
-| Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. All take `timeout=` (default 120s), `max_retries=0`. **NIM hosted endpoint rejects inline images >180 KB** (NVCF asset upload not implemented) → `NIMProvider` raises early; Gemini is the tested path for full-page scans. |
+| Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. All take `timeout=` (default 120s), `max_retries=0`. **NIM hosted endpoint rejects inline images >180 KB** (NVCF asset upload not implemented) → `NIMProvider` re-encodes in memory via `image.fit_within` (JPEG quality down, then downscale, long edge ≥ 1200 px; source untouched; loguru warning), or raises with `shrink=False`. Needs Pillow (`tabellio[nim]` / `tabellio[resize]`). Gemini is the tested path for full-page scans. |
 | Output | JSON validated by a **Pydantic** schema. `output_mode="full"` (default) -> `Act`; `output_mode="simple"` -> `ActSummary` (type/date/location/persons only), via a shorter prompt + its own schema. |
 | Ambiguity | No silent resolution: keep the original spelling, flag inferred dates, `confidence`. |
 | Storage | **None.** No database, no disk cache of user content. |
@@ -109,6 +109,8 @@ tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
 - Storage, accounts, billing, dashboard, job queue.
 - GEDCOM re-import or writing into a tree — the library **extracts**, full stop.
 - Image segmentation / heavy pre-processing (deskew, binarization) in v1.
+  (Exception: `image.fit_within` re-encodes in memory *only* to satisfy NIM's
+  180 KB transport limit — not an enhancement step, never touches the source.)
 - Languages beyond French while no non-FR act is tested.
 
 ## Stack
