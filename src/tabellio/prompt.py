@@ -1,12 +1,9 @@
-"""The extraction prompts and few-shot examples, versioned.
+"""The extraction prompts and few-shot examples.
 
 Two output modes, each with its own system prompt, few-shot and target schema:
 
 - ``full``  -> :class:`tabellio.schema.Act` (raw spelling, confidence, notes).
 - ``simple`` -> :class:`tabellio.schema.ActSummary` (identity fields only).
-
-Bump ``PROMPT_VERSION`` whenever any wording changes so extractions stay
-traceable to the instructions that produced them.
 """
 
 from __future__ import annotations
@@ -14,8 +11,6 @@ from __future__ import annotations
 import json
 
 from tabellio.schema import Act, ActSummary
-
-PROMPT_VERSION = "3"
 
 _FULL_SYSTEM = """\
 You are a palaeographer transcribing a single archival vital record (civil

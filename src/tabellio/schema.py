@@ -129,7 +129,6 @@ class Act(BaseModel):
             "Metadata only -- free text is transcribed in the source language, never translated."
         ),
     )
-    prompt_version: str | None = None
     provider: str | None = None
     warnings: list[str] = Field(
         default_factory=list,

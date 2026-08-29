@@ -99,13 +99,12 @@ def parse(
     data, mime = load_image(image)
     impl = get_provider(provider)
     logger.debug(
-        "tabellio.parse provider={} model={} mode={} bytes={} mime={} prompt_v={}",
+        "tabellio.parse provider={} model={} mode={} bytes={} mime={}",
         provider,
         model or "<default>",
         output_mode,
         len(data),
         mime,
-        _prompt.PROMPT_VERSION,
     )
 
     raw = impl.extract(
@@ -136,6 +135,5 @@ def parse(
     if isinstance(result, ActSummary):
         return result
 
-    result.prompt_version = _prompt.PROMPT_VERSION
     result.provider = provider
     return _validate(result) if validate else result

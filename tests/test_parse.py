@@ -14,7 +14,6 @@ def test_parse_happy_path(png_bytes, fictional_act, fake_provider):
     act = parse(png_bytes, provider="fake", api_key="k")
     assert act.type == "death"
     assert act.provider == "fake"
-    assert act.prompt_version == _prompt.PROMPT_VERSION
     # BYOK key is forwarded, not swallowed
     assert impl.calls[0]["api_key"] == "k"
 

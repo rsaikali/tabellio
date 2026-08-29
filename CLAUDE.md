@@ -104,11 +104,12 @@ tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
 - `src/tabellio/schema.py`: Pydantic models (`Act`, `Person`, `GenDate`…).
 - `src/tabellio/validate.py`: post-extraction rules (date/role consistency, 2-digit years,
   `confidence`).
-- `src/tabellio/prompt.py`: the extraction prompts + few-shot, versioned. One
-  `PROMPT_VERSION` covers both modes; `system_prompt` / `few_shot` /
-  `user_prompt` take `output_mode`.
+- `src/tabellio/prompt.py`: the extraction prompts + few-shot. `system_prompt`
+  / `few_shot` / `user_prompt` take `output_mode`. Not separately versioned —
+  the package version + git is the record until users actually need more.
 - `python -m tabellio <image>` exists (`__main__.py`): thin CLI, config from
-  the env vars, `--provider` / `--model` / `--hint` / `-v` overrides.
+  the env vars, `--provider` / `--model` / `--hint` / `--lang` / `--output` /
+  `-v`.
 
 ## Out of scope — refuse
 

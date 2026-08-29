@@ -34,7 +34,7 @@ def test_extra_forbidden():
 def test_defaults(fictional_act):
     act = Act.model_validate(fictional_act)
     assert act.warnings == []
-    assert act.prompt_version is None
+    assert act.provider is None
 
 
 def test_act_language_field(fictional_act):
