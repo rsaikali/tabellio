@@ -15,6 +15,23 @@ def test_unknown_provider():
         get_provider("does-not-exist")
 
 
+def test_nim_rejects_oversized_inline_image():
+    from tabellio.errors import ProviderError
+    from tabellio.providers.nim import INLINE_IMAGE_LIMIT, NIMProvider
+
+    big = b"\xff\xd8\xff" + b"0" * INLINE_IMAGE_LIMIT
+    with pytest.raises(ProviderError, match="180 KB"):
+        NIMProvider().extract(
+            image=big,
+            mime="image/jpeg",
+            system_prompt="s",
+            few_shot=[],
+            user_prompt="u",
+            api_key="k",
+            model=None,
+        )
+
+
 @pytest.mark.parametrize("name", available_providers())
 def test_missing_sdk_raises_provider_not_available(name):
     """If the optional SDK is absent, get_provider must say so cleanly."""

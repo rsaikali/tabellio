@@ -79,6 +79,9 @@ def parse(
     validate:
         Run :mod:`tabellio.validate` consistency rules and fill ``act.warnings``.
         Ignored in ``output_mode="simple"``.
+    **provider_options:
+        Passed straight to the provider, e.g. ``timeout`` (seconds, default 120),
+        ``base_url``, ``host``, ``max_tokens``.
     """
     if output_mode not in _TARGET:
         raise ValueError(f"output_mode must be 'full' or 'simple', got {output_mode!r}")

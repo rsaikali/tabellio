@@ -9,6 +9,7 @@ from tabellio.image import to_data_url
 
 DEFAULT_MODEL = "gpt-4o"
 DEFAULT_BASE_URL: str | None = None
+DEFAULT_TIMEOUT = 120.0
 
 
 class OpenAIProvider:
@@ -25,11 +26,17 @@ class OpenAIProvider:
         api_key: str | None,
         model: str | None,
         base_url: str | None = None,
+        timeout: float = DEFAULT_TIMEOUT,
         **options: object,
     ) -> str:
         if not api_key:
             raise ProviderError(f"{self.name} provider requires an API key (BYOK)")
-        client = OpenAI(api_key=api_key, base_url=base_url or DEFAULT_BASE_URL)
+        client = OpenAI(
+            api_key=api_key,
+            base_url=base_url or DEFAULT_BASE_URL,
+            timeout=timeout,
+            max_retries=0,
+        )
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
         messages += [{"role": m["role"], "content": m["content"]} for m in few_shot]
         messages.append(

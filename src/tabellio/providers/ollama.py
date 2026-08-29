@@ -12,6 +12,7 @@ from tabellio.errors import ProviderError
 
 DEFAULT_MODEL = "llama3.2-vision"
 DEFAULT_HOST = "http://localhost:11434"
+DEFAULT_TIMEOUT = 120.0
 
 
 class OllamaProvider:
@@ -28,9 +29,10 @@ class OllamaProvider:
         api_key: str | None = None,
         model: str | None,
         host: str | None = None,
+        timeout: float = DEFAULT_TIMEOUT,
         **options: object,
     ) -> str:
-        client = Client(host=host or DEFAULT_HOST)
+        client = Client(host=host or DEFAULT_HOST, timeout=timeout)
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
         messages += [{"role": m["role"], "content": m["content"]} for m in few_shot]
         messages.append({"role": "user", "content": user_prompt, "images": [image]})

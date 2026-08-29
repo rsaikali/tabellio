@@ -94,8 +94,14 @@ from the environment — never a CLI argument. `--provider`, `--model` and
 | `ollama` | `tabellio[ollama]` | `llama3.2-vision` (local, no key) |
 
 Set `TABELLIO_MODEL` (or pass `model=`) to switch model — quality vs speed is
-your call. Provider-specific keyword options pass straight through
-(`base_url=`, `host=`, `max_tokens=`, ...).
+your call. Keyword options pass straight through: `timeout=` (seconds, default
+120), `base_url=`, `host=`, `max_tokens=`.
+
+**NIM caveat.** The hosted endpoint (`integrate.api.nvidia.com`) rejects inline
+images larger than ~180 KB and queues free-tier requests (cold starts of
+minutes). tabellio raises a clear error on oversized images rather than hanging;
+NVCF asset upload for large scans is not implemented. For full-page act scans,
+`gemini` is the tested path.
 
 > Local / general-purpose VLMs hallucinate plausible names and dates on old
 > cursive. The `ollama` provider exists for convenience and testing, not for

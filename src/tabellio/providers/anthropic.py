@@ -9,6 +9,7 @@ import anthropic
 from tabellio.errors import ProviderError
 
 DEFAULT_MODEL = "claude-sonnet-4-20250514"
+DEFAULT_TIMEOUT = 120.0
 
 
 class AnthropicProvider:
@@ -25,11 +26,12 @@ class AnthropicProvider:
         api_key: str | None,
         model: str | None,
         max_tokens: int = 4096,
+        timeout: float = DEFAULT_TIMEOUT,
         **options: object,
     ) -> str:
         if not api_key:
             raise ProviderError("anthropic provider requires an API key (BYOK)")
-        client = anthropic.Anthropic(api_key=api_key)
+        client = anthropic.Anthropic(api_key=api_key, timeout=timeout, max_retries=0)
         messages: list[dict] = [{"role": m["role"], "content": m["content"]} for m in few_shot]
         messages.append(
             {

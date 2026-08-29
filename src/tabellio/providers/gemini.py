@@ -8,6 +8,7 @@ from google.genai import types
 from tabellio.errors import ProviderError
 
 DEFAULT_MODEL = "gemini-3.6-flash"
+DEFAULT_TIMEOUT = 120.0
 
 
 class GeminiProvider:
@@ -23,11 +24,15 @@ class GeminiProvider:
         user_prompt: str,
         api_key: str | None,
         model: str | None,
+        timeout: float = DEFAULT_TIMEOUT,
         **options: object,
     ) -> str:
         if not api_key:
             raise ProviderError("gemini provider requires an API key (BYOK)")
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=int(timeout * 1000)),
+        )
         contents = [types.Part.from_text(text=m["content"]) for m in few_shot]
         contents += [
             types.Part.from_text(text=user_prompt),
