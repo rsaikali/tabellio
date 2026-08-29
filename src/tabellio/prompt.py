@@ -15,42 +15,52 @@ import json
 
 from tabellio.schema import Act, ActSummary
 
-PROMPT_VERSION = "1"
+PROMPT_VERSION = "2"
 
 _FULL_SYSTEM = """\
-You are a palaeographer transcribing a single French civil-registry or parish
-record from an image. Produce a strict JSON object matching the provided schema.
+You are a palaeographer transcribing a single archival vital record (civil
+registry, parish register, notarial act or similar) from an image. The act may
+be in any language or script -- French, Latin, German, Dutch, Spanish, Italian,
+English, and so on. Produce a strict JSON object matching the provided schema.
 
 Rules:
-- Transcribe, do not interpret. Never invent a name, date, place or fact that is
-  not legible in the image.
-- Keep the original spelling in every `raw` field, including archaic forms,
-  abbreviations and diacritics as written.
-- For each transcribed field give a `confidence` between 0 and 1 reflecting how
-  sure you are of the reading.
+- Transcribe, do not translate. Every free-text value stays in the language and
+  spelling of the act. Latinised names stay Latinised ("Joannes", not "Jean");
+  place names stay as written.
+- Keep the exact original spelling in every `raw` field: archaic forms,
+  diacritics, ligatures, scribal abbreviations.
+- You may expand a clear abbreviation in `value` (e.g. "Jo~es" -> "Joannes") but
+  never beyond what the abbreviation stands for.
+- Never invent a name, date, place or fact that is not legible in the image.
+- For each transcribed field give a `confidence` between 0 and 1.
 - A date deduced (for instance from a stated age) must have `inferred: true` and
   a `note` explaining the deduction.
 - If a field cannot be read, leave it null and add a short `note`. Do not guess.
-- `source_hint`: "parish" for religious registers, "civil" for etat civil,
-  "unknown" if you cannot tell.
+- `language`: the act's main language as an ISO 639-1 code ("fr", "la", "de"...).
+- `source_hint`: "parish" for religious registers, "civil" for state civil
+  registration, "unknown" if you cannot tell.
+- `type` and every `role` use the schema's English vocabulary regardless of the
+  language of the act.
 - Output JSON only. No prose, no markdown fences.
 """
 
 _SIMPLE_SYSTEM = """\
-You are a palaeographer transcribing a single French civil-registry or parish
-record from an image. Return a strict JSON object with EXACTLY these keys:
+You are a palaeographer transcribing a single archival vital record from an
+image, in any language or script. Return a strict JSON object with EXACTLY these
+keys:
 
 - "type": one of birth, baptism, marriage, death, burial
 - "date": the date of the act as ISO "YYYY-MM-DD" (or "YYYY-MM" / "YYYY" if only
   that is legible), else null
-- "location": the town or parish, else null
+- "location": the town or parish, as written, else null
 - "persons": array of objects {"role", "given", "surname"} where role is one of
   subject, father, mother, groom, bride, witness, godparent, officiant,
   declarant, spouse, other
 
-Transcribe only what is legible; use null for anything you cannot read. Do not
-guess, do not explain. No raw spelling, no confidence, no notes, no extra keys.
-Output JSON only. No prose, no markdown fences.
+Transcribe, do not translate: names and places stay in the language and spelling
+of the act (Latinised names stay Latinised). Use null for anything you cannot
+read. Do not guess, do not explain. No extra keys. Output JSON only, no markdown
+fences.
 """
 
 _FULL_EXAMPLE = {
@@ -88,6 +98,7 @@ _FULL_EXAMPLE = {
         {"kind": "margin", "text": "baptisee le mesme jour", "confidence": 0.7},
     ],
     "source_hint": "parish",
+    "language": "fr",
 }
 
 _SIMPLE_EXAMPLE = {
@@ -120,16 +131,23 @@ def few_shot(output_mode: str) -> list[dict[str, str]]:
     ]
 
 
-def user_prompt(act_type_hint: str | None = None, output_mode: str = "full") -> str:
-    hint = (
-        f"\nThe caller believes this is a {act_type_hint} act; verify against the image."
-        if act_type_hint
-        else ""
-    )
+def user_prompt(
+    act_type_hint: str | None = None,
+    output_mode: str = "full",
+    act_language_hint: str | None = None,
+) -> str:
+    hints = ""
+    if act_type_hint:
+        hints += f"\nThe caller believes this is a {act_type_hint} act; verify against the image."
+    if act_language_hint:
+        hints += (
+            f"\nThe caller believes the act is written in {act_language_hint}; "
+            "verify against the image."
+        )
     if output_mode == "simple":
-        return "Transcribe the act in this image as the concise JSON described above." + hint
+        return "Transcribe the act in this image as the concise JSON described above." + hints
     schema = json.dumps(Act.model_json_schema(), ensure_ascii=False)
     return (
         "Transcribe the act in this image into the JSON schema below.\n\n"
-        f"JSON schema:\n{schema}{hint}"
+        f"JSON schema:\n{schema}{hints}"
     )

@@ -14,7 +14,7 @@ def test_parse_happy_path(png_bytes, fictional_act, fake_provider):
     act = parse(png_bytes, provider="fake", api_key="k")
     assert act.type == "death"
     assert act.provider == "fake"
-    assert act.prompt_version == "1"
+    assert act.prompt_version == _prompt.PROMPT_VERSION
     # BYOK key is forwarded, not swallowed
     assert impl.calls[0]["api_key"] == "k"
 
@@ -55,6 +55,18 @@ def test_parse_explicit_args_beat_env(png_bytes, fictional_act, fake_provider, m
     assert act.provider == "fake"
     assert impl.calls[0]["api_key"] == "arg-key"
     assert impl.calls[0]["model"] == "arg-model"
+
+
+def test_parse_language_hint_reaches_prompt(png_bytes, fictional_act, fake_provider):
+    impl = fake_provider(json.dumps(fictional_act))
+    parse(png_bytes, provider="fake", api_key="k", act_language_hint="la")
+    assert "written in la" in impl.calls[0]["user_prompt"]
+
+
+def test_parse_no_language_hint_no_language_line(png_bytes, fictional_act, fake_provider):
+    impl = fake_provider(json.dumps(fictional_act))
+    parse(png_bytes, provider="fake", api_key="k")
+    assert "believes the act is written" not in impl.calls[0]["user_prompt"]
 
 
 def test_parse_simple_mode_returns_summary(png_bytes, fictional_summary, fake_provider):

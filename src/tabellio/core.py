@@ -48,6 +48,7 @@ def parse(
     api_key: str | None = None,
     model: str | None = None,
     act_type_hint: str | None = None,
+    act_language_hint: str | None = None,
     output_mode: OutputMode = "full",
     validate: bool = True,
     **provider_options: object,
@@ -70,6 +71,11 @@ def parse(
     act_type_hint:
         Optional caller guess (``"birth"``, ``"marriage"``...). The model still
         verifies it against the image.
+    act_language_hint:
+        Optional caller guess at the act's language (``"fr"``, ``"la"``,
+        ``"de"``...). The model still verifies it and records the detected
+        language on ``act.language``. Text is transcribed in the source
+        language, never translated.
     output_mode:
         ``"full"`` (default) returns a rich :class:`~tabellio.schema.Act` with
         raw spelling, per-field ``confidence``, inference flags and validation
@@ -107,7 +113,7 @@ def parse(
         mime=mime,
         system_prompt=_prompt.system_prompt(output_mode),
         few_shot=_prompt.few_shot(output_mode),
-        user_prompt=_prompt.user_prompt(act_type_hint, output_mode),
+        user_prompt=_prompt.user_prompt(act_type_hint, output_mode, act_language_hint),
         api_key=api_key,
         model=model,
         **provider_options,

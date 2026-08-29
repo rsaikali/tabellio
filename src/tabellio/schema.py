@@ -122,6 +122,13 @@ class Act(BaseModel):
     persons: list[Person] = Field(default_factory=list)
     other: list[Note] = Field(default_factory=list)
     source_hint: SourceHint = SourceHint.UNKNOWN
+    language: str | None = Field(
+        default=None,
+        description=(
+            "Main language of the act as an ISO 639-1 code ('fr', 'la', 'de', ...). "
+            "Metadata only -- free text is transcribed in the source language, never translated."
+        ),
+    )
     prompt_version: str | None = None
     provider: str | None = None
     warnings: list[str] = Field(

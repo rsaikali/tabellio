@@ -37,6 +37,12 @@ def test_defaults(fictional_act):
     assert act.prompt_version is None
 
 
+def test_act_language_field(fictional_act):
+    assert Act.model_validate(fictional_act).language is None
+    latin = {**fictional_act, "language": "la"}
+    assert Act.model_validate(latin).language == "la"
+
+
 def test_act_summary(fictional_summary):
     s = ActSummary.model_validate(fictional_summary)
     assert s.type == "death"

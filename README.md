@@ -13,6 +13,10 @@ JSON**.
   consistency rules, not from trusting the model.
 - **No silent resolution.** Original spelling is kept, inferred dates are
   flagged, every field carries a `confidence`.
+- **Any language or script.** Text is transcribed in the language of the act
+  (Latin, French, German, …) and **never translated**; only the schema's
+  `type` / `role` vocabulary is fixed English. The detected language is recorded
+  on `act.language`.
 
 ## Install
 
@@ -56,7 +60,16 @@ act = tabellio.parse("register-page.jpg", output_mode="simple")
   `confidence`, inference flags, validation `warnings`.
 - `output_mode="simple"` — sends a shorter prompt, returns a bare `ActSummary`:
   `type`, `date` (ISO string or `null`), `location`, `persons`. No confidence,
-  no raw, no inference, no notes. Fewer tokens in and out.
+  no raw, no inference, no notes, no `language`. Fewer tokens in and out.
+
+### Hints
+
+```python
+tabellio.parse(img, act_type_hint="baptism", act_language_hint="la")
+```
+
+Both are optional guesses; the model verifies them against the image. `--hint`
+and `--lang` on the CLI.
 
 ### Configuration
 
@@ -118,8 +131,8 @@ implemented.
 surfacing, provider-agnostic adapter.
 
 **Out:** embedded/trained model, home-grown HTR, storage, accounts, billing,
-GEDCOM import or writing into a tree, image segmentation / deskew, languages
-beyond French (until a non-FR act is tested).
+GEDCOM import or writing into a tree, image segmentation / deskew,
+**translation** of any transcribed text.
 
 ## Development
 

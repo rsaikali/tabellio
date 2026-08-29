@@ -38,6 +38,12 @@ def main(argv: list[str] | None = None) -> int:
         help="act type hint (still verified against the image)",
     )
     ap.add_argument(
+        "--lang",
+        default=None,
+        metavar="ISO",
+        help="act language hint, ISO 639-1 e.g. fr, la, de (still verified)",
+    )
+    ap.add_argument(
         "--output",
         default="full",
         choices=["full", "simple"],
@@ -56,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
             provider=args.provider,
             model=args.model,
             act_type_hint=args.hint,
+            act_language_hint=args.lang,
             output_mode=args.output,
             validate=not args.no_validate,
         )
