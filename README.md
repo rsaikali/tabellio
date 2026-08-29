@@ -89,7 +89,7 @@ from the environment — never a CLI argument. `--provider`, `--model` and
 |---|---|---|
 | `gemini` | `tabellio[gemini]` | `gemini-3.6-flash` |
 | `openai` | `tabellio[openai]` | `gpt-4o` |
-| `nim` | `tabellio[nim]` (pulls Pillow) | `meta/llama-3.2-90b-vision-instruct` |
+| `nim` | `tabellio[nim]` (pulls Pillow) | `meta/llama-3.2-11b-vision-instruct` |
 | `anthropic` | `tabellio[anthropic]` | `claude-sonnet-4` |
 | `ollama` | `tabellio[ollama]` | `llama3.2-vision` (local, no key) |
 
@@ -97,13 +97,16 @@ Set `TABELLIO_MODEL` (or pass `model=`) to switch model — quality vs speed is
 your call. Keyword options pass straight through: `timeout=` (seconds, default
 120), `base_url=`, `host=`, `max_tokens=`.
 
-**NIM caveat.** The hosted endpoint (`integrate.api.nvidia.com`) rejects inline
-images larger than ~180 KB and queues free-tier requests (cold starts of
-minutes). tabellio re-encodes an oversized image **in memory** (lower JPEG
-quality, then downscale, long edge kept ≥ 1200 px) before sending — the source
-file is never touched — and logs a warning; pass `shrink=False` to get an error
-instead. NVCF asset upload is not implemented. `gemini` is still the tested path
-for full-page scans.
+**NIM caveat.** On the hosted free endpoint (`integrate.api.nvidia.com`) the 90B
+vision model routinely times out; the default is therefore
+`meta/llama-3.2-11b-vision-instruct`, which answers in seconds but is a small
+model — it hallucinates names and dates on old cursive and returns poor results
+here. Use `--output simple` with it, and treat `gemini` as the real path.
+The endpoint also rejects inline images larger than ~180 KB: tabellio re-encodes
+an oversized image **in memory** (lower JPEG quality, then downscale, long edge
+kept ≥ 1200 px) before sending — the source file is never touched — and logs a
+warning; pass `shrink=False` to get an error instead. NVCF asset upload is not
+implemented.
 
 > Local / general-purpose VLMs hallucinate plausible names and dates on old
 > cursive. The `ollama` provider exists for convenience and testing, not for

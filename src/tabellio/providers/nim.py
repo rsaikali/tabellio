@@ -15,7 +15,10 @@ from tabellio.errors import ProviderError
 from tabellio.image import fit_within
 from tabellio.providers.openai import OpenAIProvider
 
-DEFAULT_MODEL = "meta/llama-3.2-90b-vision-instruct"
+# The hosted 90B vision model routinely times out on the free tier; the 11B
+# responds in seconds. Override with TABELLIO_MODEL / model= if you have better
+# capacity.
+DEFAULT_MODEL = "meta/llama-3.2-11b-vision-instruct"
 DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1"
 
 #: NVCF rejects inline images larger than this; measured on the raw bytes.
