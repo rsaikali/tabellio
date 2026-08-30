@@ -4,17 +4,22 @@ Turn an image of a civil-registry or parish record into **validated structured
 JSON**.
 
 > *tabellio*: the Roman / medieval scribe who officially drafted legal acts.
->
+
+
 > The '*vieux tabellion*' Georges Brassens addresses in *Supplique pour être
 > enterré sur la plage de Sète* (1966):
 >
 > > *Trempe dans l'encre bleue du Golfe du Lion,*
-> > *Trempe, trempe ta plume, ô mon vieux tabellion,*
+>>
+> > *Trempe, trempe ta plume, ô mon vieux **tabellion**,*
+>>
 > > *Et de ta plus belle écriture,*
+>>
 > > *Note ce qu'il faudrait qu'il advînt de mon corps…*
 >
-> This library reads back what that pen wrote.
-> ([Brassens sings it — INA archive](https://www.ina.fr/ina-eclaire-actu/video/i00014904/georges-brassens-supplique-pour-etre-enterre-a-la-plage-de-sete))
+> [Brassens - INA archive](https://www.ina.fr/ina-eclaire-actu/video/i00014904/georges-brassens-supplique-pour-etre-enterre-a-la-plage-de-sete)
+
+This library reads back what that pen wrote.
 
 - **BYOK** — you pass your own VLM API key; it is never stored, never logged.
 - **Provider-agnostic** — Gemini, OpenAI, NVIDIA NIM, Anthropic, or a local
@@ -42,9 +47,10 @@ A parish burial act from 1757, a public-domain register page,
 ![1757 burial act](examples/sample_act.jpg)
 
 ```bash
+export TABELLIO_PROVIDER=...
 export TABELLIO_KEY=...
 for mode in full simple transcription; do
-    python -m tabellio examples/sample_act.jpg --hint burial --output "$mode"
+    python -m tabellio examples/sample_act.jpg --output "$mode"
 done
 ```
 
@@ -105,8 +111,9 @@ for mode in ("full", "simple", "transcription"):
   `null`), `location`, `persons` (role / given / surname). Nothing else — no
   confidence, no raw, no qualifiers, no `language`, no life-event dates, no
   transcription. Shortest prompt, fewest tokens.
-- `output_mode="transcription"` — just `Transcription`: the verbatim `text` of
-  the act (`[?]` / `[illegible]` for gaps) plus the detected `language`.
+- `output_mode="transcription"` — a `Transcription`: `{text, language}` — the
+  verbatim text of the act (`[?]` / `[illegible]` for gaps) and its detected
+  language, nothing else. Still JSON, just two fields.
 
 ### Hints
 
@@ -173,9 +180,10 @@ python -m tabellio examples/sample_act.jpg [--hint baptism] [--lang fr] [--conte
     [--output simple|transcription] [--format gedcom] [-v]
 ```
 
-Prints the act as JSON (or GEDCOM 7 with `--format gedcom`, or plain text with
-`--output transcription`) on stdout, warnings on stderr. The key is only read
-from the environment — never a CLI argument.
+Prints the result as JSON — `Act`, `ActSummary` or `Transcription` per
+`--output` — on stdout, warnings on stderr; `--format gedcom` prints a GEDCOM 7
+document instead. The key is only read from the environment, never a CLI
+argument.
 
 ## Providers
 

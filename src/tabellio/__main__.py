@@ -15,7 +15,7 @@ from loguru import logger
 from tabellio import parse, to_gedcom
 from tabellio.errors import TabellioError
 from tabellio.providers import available_providers
-from tabellio.schema import Act, Transcription
+from tabellio.schema import Act
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -88,8 +88,6 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.format == "gedcom" and isinstance(act, Act):
         print(to_gedcom(act), end="")
-    elif isinstance(act, Transcription):
-        print(act.text)
     else:
         print(act.model_dump_json(indent=2, exclude_none=True))
     warnings = getattr(act, "warnings", [])

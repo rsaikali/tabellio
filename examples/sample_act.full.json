@@ -1,0 +1,117 @@
+{
+    "type": "burial",
+    "date": {
+        "raw": "Le vingt deuxieme jour de decembre mil sept cent cinquante sept",
+        "iso": "1757-12-22",
+        "qualifier": "exact",
+        "calendar": "gregorian",
+        "confidence": 0.95
+    },
+    "transcription": "Le vingt deuxieme jour de decembre mil\nsept cent cinquante sept a été inhumé dans le\ncimetiere de cette paroisse le corps de Joseph\nCommal dcdé d'hier au village de evannie\nagé d'environ soixante treize ans; En presence\njulien Commal, louis oheix Et autres qui ne\nsignent.\nJ: caillon vicaire",
+    "persons": [
+        {
+            "role": "subject",
+            "given": {
+                "value": "Joseph",
+                "raw": "Joseph",
+                "confidence": 0.95,
+                "inferred": false
+            },
+            "surname": {
+                "value": "Commal",
+                "raw": "Commal",
+                "confidence": 0.95,
+                "inferred": false
+            },
+            "sex": {
+                "value": "male",
+                "confidence": 0.95,
+                "inferred": true
+            },
+            "age": {
+                "value": "73 ans",
+                "raw": "environ soixante treize ans",
+                "confidence": 0.9,
+                "inferred": false
+            },
+            "death_date": {
+                "raw": "dcdé d'hier",
+                "iso": "1757-12-21",
+                "qualifier": "calculated",
+                "calendar": "gregorian",
+                "confidence": 0.9,
+                "note": "act states 'dcdé d'hier'; burial on 1757-12-22"
+            },
+            "death_place": {
+                "value": "Evannie",
+                "raw": "village de evannie",
+                "confidence": 0.85,
+                "inferred": false
+            }
+        },
+        {
+            "role": "witness",
+            "given": {
+                "value": "Julien",
+                "raw": "julien",
+                "confidence": 0.95,
+                "inferred": false
+            },
+            "surname": {
+                "value": "Commal",
+                "raw": "Commal",
+                "confidence": 0.95,
+                "inferred": false
+            }
+        },
+        {
+            "role": "witness",
+            "given": {
+                "value": "Louis",
+                "raw": "louis",
+                "confidence": 0.95,
+                "inferred": false
+            },
+            "surname": {
+                "value": "Oheix",
+                "raw": "oheix",
+                "confidence": 0.85,
+                "inferred": false
+            }
+        },
+        {
+            "role": "officiant",
+            "given": {
+                "value": "J.",
+                "raw": "J:",
+                "confidence": 0.9,
+                "inferred": false
+            },
+            "surname": {
+                "value": "Caillon",
+                "raw": "caillon",
+                "confidence": 0.9,
+                "inferred": false
+            },
+            "occupation": {
+                "value": "vicaire",
+                "raw": "vicaire",
+                "confidence": 0.95,
+                "inferred": false
+            }
+        }
+    ],
+    "other": [
+        {
+            "kind": "margin",
+            "text": "Sep de Joseph Commal",
+            "confidence": 0.9
+        }
+    ],
+    "source_hint": "parish",
+    "language": "fr",
+    "provider": "gemini",
+    "warnings": [
+        "death date for Joseph Commal is calculated, not stated on the act"
+    ]
+}

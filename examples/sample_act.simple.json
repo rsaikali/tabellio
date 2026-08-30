@@ -1,0 +1,26 @@
+{
+    "type": "burial",
+    "date": "1757-12-22",
+    "persons": [
+        {
+            "role": "subject",
+            "given": "Joseph",
+            "surname": "Commal"
+        },
+        {
+            "role": "witness",
+            "given": "Julien",
+            "surname": "Commal"
+        },
+        {
+            "role": "witness",
+            "given": "Louis",
+            "surname": "Cheux"
+        },
+        {
+            "role": "officiant",
+            "given": "J.",
+            "surname": "Caillon"
+        }
+    ]
+}
