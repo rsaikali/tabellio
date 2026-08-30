@@ -1,5 +1,8 @@
 # tabellio
 
+[![CI](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml/badge.svg)](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 Turn an image of a civil-registry or parish record into **validated structured
 JSON**.
 

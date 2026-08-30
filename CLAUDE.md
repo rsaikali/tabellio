@@ -139,3 +139,7 @@ tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
 Python 3.14, `uv` (deps/venv), `ruff` (lint + format), `pytest`. `loguru` for
 logs. Pydantic v2. Provider SDKs as optional dependencies
 (`pip install tabellio[gemini]` etc.).
+
+CI (`.github/workflows/ci.yml`): `lint` job (ruff check + format --check on
+3.13) and a `test` matrix on Python 3.11–3.14, all via `uv sync --all-extras` +
+`uv run`. Public repo: `github.com/rsaikali/tabellio`.
