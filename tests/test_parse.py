@@ -62,6 +62,34 @@ def test_parse_language_hint_reaches_prompt(png_bytes, fictional_act, fake_provi
     assert "written in la" in impl.calls[0]["user_prompt"]
 
 
+def test_parse_context_reaches_prompt(png_bytes, fictional_act, fake_provider):
+    impl = fake_provider(json.dumps(fictional_act))
+    parse(
+        png_bytes,
+        provider="fake",
+        api_key="k",
+        context="The deceased is Joseph BOMMAL, buried 21 December 1757.",
+    )
+    prompt = impl.calls[0]["user_prompt"]
+    assert "Joseph BOMMAL" in prompt
+    assert "never to override a clear reading" in prompt
+    assert "add a `note`" in prompt  # full-mode discrepancy instruction
+
+
+def test_parse_context_note_instruction_is_full_mode_only(
+    png_bytes, fictional_summary, fake_provider
+):
+    impl = fake_provider(json.dumps(fictional_summary))
+    parse(png_bytes, provider="fake", api_key="k", context="X", output_mode="simple")
+    assert "add a `note`" not in impl.calls[0]["user_prompt"]
+
+
+def test_parse_no_context_no_context_block(png_bytes, fictional_act, fake_provider):
+    impl = fake_provider(json.dumps(fictional_act))
+    parse(png_bytes, provider="fake", api_key="k")
+    assert "Caller context" not in impl.calls[0]["user_prompt"]
+
+
 def test_parse_no_language_hint_no_language_line(png_bytes, fictional_act, fake_provider):
     impl = fake_provider(json.dumps(fictional_act))
     parse(png_bytes, provider="fake", api_key="k")

@@ -193,6 +193,7 @@ def user_prompt(
     act_type_hint: str | None = None,
     output_mode: str = "full",
     act_language_hint: str | None = None,
+    context: str | None = None,
 ) -> str:
     hints = ""
     if act_type_hint:
@@ -201,6 +202,19 @@ def user_prompt(
         hints += (
             f"\nThe caller believes the act is written in {act_language_hint}; "
             "verify against the image."
+        )
+    if context:
+        hints += (
+            "\n\nThe caller already knows the following about this act. Use it only to "
+            "resolve genuinely ambiguous or hard-to-read passages -- never to override a "
+            "clear reading on the image. Where the context conflicts with what is plainly "
+            "written, follow the image"
+            + (
+                " and add a `note` on the affected field explaining the discrepancy.\n"
+                if output_mode == "full"
+                else ".\n"
+            )
+            + f"Caller context: {context.strip()}"
         )
     if output_mode == "transcription":
         return "Transcribe the complete text of the act in this image, as the JSON above." + hints

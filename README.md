@@ -78,11 +78,20 @@ for mode in ("full", "simple", "transcription"):
 ### Hints
 
 ```python
-tabellio.parse(img, act_type_hint="baptism", act_language_hint="la")
+tabellio.parse(
+    img,
+    act_type_hint="burial",           # --hint
+    act_language_hint="fr",            # --lang
+    context="The deceased is Joseph BOMMAL, buried 21 December 1757.",  # --context
+)
 ```
 
-Both are optional guesses; the model verifies them against the image. `--hint`
-and `--lang` on the CLI.
+All three are optional. `act_type_hint` / `act_language_hint` are guesses the
+model verifies against the image. `context` is free text of whatever you already
+know — names, a date, a place. It is used **only** to disambiguate hard-to-read
+passages: it never overrides a clear reading, `raw` stays faithful to the page,
+and in `full` mode the model adds a `note` wherever it followed the image
+against your context.
 
 ### GEDCOM
 
@@ -127,7 +136,8 @@ The key is never logged and never stored.
 ```bash
 export TABELLIO_PROVIDER=gemini
 export TABELLIO_KEY=...              # in your shell
-python -m tabellio data/act.jpg [--hint baptism] [--output simple|transcription] [--format gedcom] [-v]
+python -m tabellio data/act.jpg [--hint baptism] [--lang fr] [--context "..."] \
+    [--output simple|transcription] [--format gedcom] [-v]
 ```
 
 Prints the act as JSON (or GEDCOM 7 with `--format gedcom`) on stdout, warnings

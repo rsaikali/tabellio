@@ -58,6 +58,7 @@ Decision chain, in the order it was settled:
 | Transcription | Complete verbatim diplomatic transcription, source language + line breaks kept, `[?]` = one illegible word, `[illegible]` = a longer passage. As `Act.transcription` in full mode (`validate` warns if missing; GEDCOM `SOUR.TEXT`) or as the whole result in `"transcription"` mode. **Not** in `simple`. |
 | Serialisers | One `parse()` (the only network call). `act.model_dump_json()` = JSON. `tabellio.to_gedcom(act)` = a complete **GEDCOM 7.0** document (`gedcom.py`; conformance-checked in tests against the `gedcom7` lib). No YAML helper (one-liner + a dep). Schema is GEDCOM-mappable by design: `GenDate.qualifier`/`calendar`, `Person.name_particle`/`name_suffix`, `Role` → `ASSO.ROLE`. |
 | Ambiguity | No silent resolution: keep the original spelling, `qualifier` on every date, per-field `confidence`. |
+| Hints | `act_type_hint` (`--hint`, enum) and `act_language_hint` (`--lang`, ISO code) — guesses verified against the image. `context` (`--context`, free text: names / date / place the caller already knows) — used **only** to disambiguate hard-to-read passages, never to override a clear reading; `raw` stays faithful; full mode adds a `note` where image beats context. |
 | Act language | **International.** Any language or script (French, Latin, German, Dutch, Spanish, …). **Transcribe, never translate**: `raw`/`value` free text stays in the source language, Latinised names stay Latinised. Only `type` and `role` are a fixed English vocabulary. `Act.language` = model-detected ISO 639-1 code (full mode only). Optional `act_language_hint=` / `--lang`, verified against the image like `act_type_hint`. |
 | Storage | **None.** No database, no disk cache of user content. |
 | Accounts / billing | **None.** Permanently out of scope for the library. |
@@ -99,7 +100,7 @@ this table is intent only.
 ```
 tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
                api_key=..., model=None, act_type_hint=None, act_language_hint=None,
-               output_mode="full"|"simple"|"transcription")
+               context=None, output_mode="full"|"simple"|"transcription")
     -> Act | ActSummary | Transcription   # Pydantic
 ```
 
@@ -116,7 +117,7 @@ tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
   / `few_shot` / `user_prompt` take `output_mode`. Not separately versioned —
   the package version + git is the record until users actually need more.
 - `python -m tabellio <image>` exists (`__main__.py`): thin CLI, config from
-  the env vars, `--provider` / `--model` / `--hint` / `--lang` / `--output` /
+  the env vars, `--provider` / `--model` / `--hint` / `--lang` / `--context` / `--output` /
   `-v`.
 
 ## Out of scope — refuse

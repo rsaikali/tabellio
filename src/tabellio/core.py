@@ -49,6 +49,7 @@ def parse(
     model: str | None = None,
     act_type_hint: str | None = None,
     act_language_hint: str | None = None,
+    context: str | None = None,
     output_mode: OutputMode = "full",
     validate: bool = True,
     **provider_options: object,
@@ -76,6 +77,12 @@ def parse(
         ``"de"``...). The model still verifies it and records the detected
         language on ``act.language``. Text is transcribed in the source
         language, never translated.
+    context:
+        Free-text of anything the caller already knows about this act -- names,
+        a date, a place. Used to disambiguate hard-to-read passages only; it
+        never overrides a clear reading, and in ``"full"`` mode the model adds a
+        ``note`` wherever it followed the image against the context. ``raw``
+        stays faithful to the page regardless.
     output_mode:
         - ``"full"`` (default): a rich :class:`~tabellio.schema.Act` -- raw
           spelling, per-field ``confidence``, date ``qualifier``,
@@ -115,7 +122,7 @@ def parse(
         mime=mime,
         system_prompt=_prompt.system_prompt(output_mode),
         few_shot=_prompt.few_shot(output_mode),
-        user_prompt=_prompt.user_prompt(act_type_hint, output_mode, act_language_hint),
+        user_prompt=_prompt.user_prompt(act_type_hint, output_mode, act_language_hint, context),
         api_key=api_key,
         model=model,
         **provider_options,

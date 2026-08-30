@@ -45,6 +45,13 @@ def main(argv: list[str] | None = None) -> int:
         help="act language hint, ISO 639-1 e.g. fr, la, de (still verified)",
     )
     ap.add_argument(
+        "--context",
+        default=None,
+        metavar="TEXT",
+        help="free text you already know about the act (names, a date, a place); "
+        "used only to disambiguate, never to override a clear reading",
+    )
+    ap.add_argument(
         "--output",
         default="full",
         choices=["full", "simple", "transcription"],
@@ -71,6 +78,7 @@ def main(argv: list[str] | None = None) -> int:
             model=args.model,
             act_type_hint=args.hint,
             act_language_hint=args.lang,
+            context=args.context,
             output_mode=output_mode,
             validate=not args.no_validate,
         )
