@@ -1,9 +1,9 @@
 # tabellio
 
-[![PyPI](https://img.shields.io/pypi/v/tabellio.svg)](https://pypi.org/project/tabellio/)
-[![Python](https://img.shields.io/pypi/pyversions/tabellio.svg)](https://pypi.org/project/tabellio/)
-[![CI](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml/badge.svg)](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/rsaikali/tabellio/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/tabellio)](https://pypi.org/project/tabellio/)
+[![Python](https://img.shields.io/pypi/pyversions/tabellio)](https://pypi.org/project/tabellio/)
+[![CI](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml)
+[![License](https://img.shields.io/pypi/l/tabellio)](https://github.com/rsaikali/tabellio/blob/main/LICENSE)
 
 Turn an image of a civil-registry or parish record into **validated structured
 JSON**.
