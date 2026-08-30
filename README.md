@@ -3,8 +3,9 @@
 Turn an image of a civil-registry or parish record into **validated structured
 JSON**.
 
-> *tabellio*: the Roman / medieval scribe who officially drafted legal acts —
-> the *vieux tabellion* Georges Brassens addresses in *Supplique pour être
+> *tabellio*: the Roman / medieval scribe who officially drafted legal acts.
+>
+> The '*vieux tabellion*' Georges Brassens addresses in *Supplique pour être
 > enterré sur la plage de Sète* (1966):
 >
 > > *Trempe dans l'encre bleue du Golfe du Lion,*
@@ -13,6 +14,7 @@ JSON**.
 > > *Note ce qu'il faudrait qu'il advînt de mon corps…*
 >
 > This library reads back what that pen wrote.
+> ([Brassens sings it — INA archive](https://www.ina.fr/ina-eclaire-actu/video/i00014904/georges-brassens-supplique-pour-etre-enterre-a-la-plage-de-sete))
 
 - **BYOK** — you pass your own VLM API key; it is never stored, never logged.
 - **Provider-agnostic** — Gemini, OpenAI, NVIDIA NIM, Anthropic, or a local
