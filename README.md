@@ -26,22 +26,22 @@ JSON**.
 ## Example
 
 A parish burial act from 1757 (Joseph Bommal) — a public-domain register page,
-[`examples/3.jpg`](examples/3.jpg):
+[`examples/sample_act.jpg`](examples/sample_act.jpg):
 
-![1757 burial act](examples/3.jpg)
+![1757 burial act](examples/sample_act.jpg)
 
 ```bash
 export TABELLIO_KEY=...
 for mode in full simple transcription; do
-    python -m tabellio examples/3.jpg --hint burial --output "$mode"
+    python -m tabellio examples/sample_act.jpg --hint burial --output "$mode"
 done
 ```
 
 | Mode | Output | What you get |
 |---|---|---|
-| `full` | [`3.full.json`](examples/3.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
-| `simple` | [`3.simple.json`](examples/3.simple.json) | `type` / `date` / `location` / `persons` only |
-| `transcription` | [`3.transcription.json`](examples/3.transcription.json) | the verbatim text + detected language |
+| `full` | [`sample_act.full.json`](examples/sample_act.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
+| `simple` | [`sample_act.simple.json`](examples/sample_act.simple.json) | `type` / `date` / `location` / `persons` only |
+| `transcription` | [`sample_act.transcription.json`](examples/sample_act.transcription.json) | the verbatim text + detected language |
 
 *(The `.json` files land once the reference run against `gemini` is done.)*
 
@@ -131,7 +131,7 @@ transcribes one act; it does **not** merge a tree — your genealogy software do
 that on import. Output is conformance-checked against the `gedcom7` library in
 the test suite.
 
-CLI: `python -m tabellio examples/act.jpg --format gedcom`.
+CLI: `python -m tabellio examples/sample_act.jpg --format gedcom`.
 
 The schema is GEDCOM-mappable by design: `GenDate.qualifier`
 (`about`/`before`/`after`/`calculated` → `ABT`/`BEF`/`AFT`/`CAL`),
@@ -158,7 +158,7 @@ The key is never logged and never stored.
 ```bash
 export TABELLIO_PROVIDER=gemini
 export TABELLIO_KEY=...              # in your shell
-python -m tabellio examples/act.jpg [--hint baptism] [--lang fr] [--context "..."] \
+python -m tabellio examples/sample_act.jpg [--hint baptism] [--lang fr] [--context "..."] \
     [--output simple|transcription] [--format gedcom] [-v]
 ```
 
