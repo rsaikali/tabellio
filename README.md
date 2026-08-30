@@ -44,6 +44,14 @@ This library reads back what that pen wrote.
   `type` / `role` vocabulary is fixed English. The detected language is recorded
   on `act.language`.
 
+## Install
+
+```bash
+pip install "tabellio[gemini]"     # or [openai] / [nim] / [anthropic] / [ollama] / [all]
+```
+
+Requires Python 3.11+.
+
 ## Example
 
 A parish burial act from 1757, a public-domain register page,
@@ -64,16 +72,6 @@ done
 | `full` | [`sample_act.full.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
 | `simple` | [`sample_act.simple.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.simple.json) | `type` / `date` / `location` / `persons` only |
 | `transcription` | [`sample_act.transcription.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.transcription.json) | the verbatim text + detected language |
-
-*(The `.json` files land once the reference run against `gemini` is done.)*
-
-## Install
-
-```bash
-pip install "tabellio[gemini]"     # or [openai] / [nim] / [anthropic] / [ollama] / [all]
-```
-
-Requires Python 3.11+.
 
 ## Use
 
