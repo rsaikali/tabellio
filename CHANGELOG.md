@@ -6,9 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-08-30
+
+### Fixed
+
+- `tabellio.__version__` now derives from the installed package metadata
+  instead of a hard-coded string, so it can no longer drift from
+  `pyproject.toml`. (0.1.0 was pushed to TestPyPI only, never to PyPI.)
+
 ## [0.1.0] - 2026-08-30
 
-First public release.
+First public release (TestPyPI rehearsal only).
 
 ### Added
 
@@ -36,5 +44,6 @@ First public release.
 - `python -m tabellio <image>` CLI with `--provider` / `--model` / `--hint` /
   `--lang` / `--context` / `--output` / `--format` / `--no-validate` / `-v`.
 
-[Unreleased]: https://github.com/rsaikali/tabellio/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/rsaikali/tabellio/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/rsaikali/tabellio/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/rsaikali/tabellio/releases/tag/v0.1.0

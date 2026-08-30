@@ -5,6 +5,8 @@ BYOK (bring your own key), provider-agnostic, no embedded model, no storage.
 
 from __future__ import annotations
 
+from importlib.metadata import PackageNotFoundError, version
+
 from tabellio.core import parse
 from tabellio.errors import (
     ImageError,
@@ -29,7 +31,10 @@ from tabellio.schema import (
     Transcription,
 )
 
-__version__ = "0.0.1"
+try:
+    __version__ = version("tabellio")
+except PackageNotFoundError:  # not installed (running from a source checkout)
+    __version__ = "0+unknown"
 
 __all__ = [
     "Act",

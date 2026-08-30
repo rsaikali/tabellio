@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tabellio"
-version = "0.1.0"
+version = "0.1.1"
 description = "Image of a civil-registry / parish record -> validated structured JSON. BYOK, provider-agnostic, no embedded model, no storage."
 readme = "README.md"
 license = "Apache-2.0"
