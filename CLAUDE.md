@@ -143,3 +143,8 @@ logs. Pydantic v2. Provider SDKs as optional dependencies
 CI (`.github/workflows/ci.yml`): `lint` job (ruff check + format --check on
 3.13) and a `test` matrix on Python 3.11–3.14, all via `uv sync --all-extras` +
 `uv run`. Public repo: `github.com/rsaikali/tabellio`.
+
+Release (`.github/workflows/release.yml`, PyPI **Trusted Publishing** / OIDC, no
+token): push tag `vX.Y.Z` (must equal `[project].version`) → rehearsal on
+TestPyPI; publish a GitHub release → real PyPI. GH environments `testpypi` /
+`pypi`. Ships `py.typed`. `CHANGELOG.md` (Keep a Changelog), `SECURITY.md`.

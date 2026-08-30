@@ -1,7 +1,7 @@
 # tabellio
 
 [![CI](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml/badge.svg)](https://github.com/rsaikali/tabellio/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/rsaikali/tabellio/blob/main/LICENSE)
 
 Turn an image of a civil-registry or parish record into **validated structured
 JSON**.
@@ -45,9 +45,9 @@ This library reads back what that pen wrote.
 ## Example
 
 A parish burial act from 1757, a public-domain register page,
-[`examples/sample_act.jpg`](examples/sample_act.jpg):
+[`examples/sample_act.jpg`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.jpg):
 
-![1757 burial act](examples/sample_act.jpg)
+![1757 burial act](https://raw.githubusercontent.com/rsaikali/tabellio/main/examples/sample_act.jpg)
 
 ```bash
 export TABELLIO_PROVIDER=...
@@ -59,9 +59,9 @@ done
 
 | Mode | Output | What you get |
 |---|---|---|
-| `full` | [`sample_act.full.json`](examples/sample_act.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
-| `simple` | [`sample_act.simple.json`](examples/sample_act.simple.json) | `type` / `date` / `location` / `persons` only |
-| `transcription` | [`sample_act.transcription.json`](examples/sample_act.transcription.json) | the verbatim text + detected language |
+| `full` | [`sample_act.full.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
+| `simple` | [`sample_act.simple.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.simple.json) | `type` / `date` / `location` / `persons` only |
+| `transcription` | [`sample_act.transcription.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.transcription.json) | the verbatim text + detected language |
 
 *(The `.json` files land once the reference run against `gemini` is done.)*
 
@@ -93,7 +93,7 @@ for p in act.persons:
 print(act.warnings)  # consistency + low-confidence flags
 ```
 
-`parse()` returns an [`Act`](src/tabellio/schema.py) Pydantic model. Unread
+`parse()` returns an [`Act`](https://github.com/rsaikali/tabellio/blob/main/src/tabellio/schema.py) Pydantic model. Unread
 fields are `null` with a note — never guessed.
 
 ### Output modes
@@ -239,8 +239,8 @@ To run `python -m tabellio` against a real provider while developing, export
 shell, or use your own `direnv` / dotenv — the repo ships none.
 
 The `examples/` directory holds a sample act and its extracted output —
-**fictional or public-domain only**, see [`examples/README.md`](examples/README.md).
+**fictional or public-domain only**, see [`examples/README.md`](https://github.com/rsaikali/tabellio/blob/main/examples/README.md).
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
+Apache-2.0. See [`LICENSE`](https://github.com/rsaikali/tabellio/blob/main/LICENSE) and [`NOTICE`](https://github.com/rsaikali/tabellio/blob/main/NOTICE).

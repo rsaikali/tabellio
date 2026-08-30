@@ -4,24 +4,25 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tabellio"
-version = "0.0.1"
+version = "0.1.0"
 description = "Image of a civil-registry / parish record -> validated structured JSON. BYOK, provider-agnostic, no embedded model, no storage."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.11"
 authors = [{ name = "Roland Saikali" }]
-keywords = ["genealogy", "HTR", "OCR", "vlm", "civil-registry", "parish-register", "transcription"]
+keywords = ["genealogy", "HTR", "OCR", "vlm", "civil-registry", "parish-register", "transcription", "GEDCOM"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
+    "Topic :: Sociology :: Genealogy",
     "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
 ]
 dependencies = [
     "pydantic>=2.7",
@@ -32,6 +33,7 @@ dependencies = [
 Homepage = "https://github.com/rsaikali/tabellio"
 Repository = "https://github.com/rsaikali/tabellio"
 Issues = "https://github.com/rsaikali/tabellio/issues"
+Changelog = "https://github.com/rsaikali/tabellio/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 gemini = ["google-genai>=0.3"]
