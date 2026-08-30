@@ -80,8 +80,8 @@ for mode in ("full", "simple", "transcription"):
 ```python
 tabellio.parse(
     img,
-    act_type_hint="burial",           # --hint
-    act_language_hint="fr",            # --lang
+    act_type_hint="burial",  # --hint
+    act_language_hint="fr",  # --lang
     context="The deceased is Joseph BOMMAL, buried 21 December 1757.",  # --context
 )
 ```
@@ -109,7 +109,7 @@ transcribes one act; it does **not** merge a tree — your genealogy software do
 that on import. Output is conformance-checked against the `gedcom7` library in
 the test suite.
 
-CLI: `python -m tabellio data/act.jpg --format gedcom`.
+CLI: `python -m tabellio examples/act.jpg --format gedcom`.
 
 The schema is GEDCOM-mappable by design: `GenDate.qualifier`
 (`about`/`before`/`after`/`calculated` → `ABT`/`BEF`/`AFT`/`CAL`),
@@ -136,13 +136,13 @@ The key is never logged and never stored.
 ```bash
 export TABELLIO_PROVIDER=gemini
 export TABELLIO_KEY=...              # in your shell
-python -m tabellio data/act.jpg [--hint baptism] [--lang fr] [--context "..."] \
+python -m tabellio examples/act.jpg [--hint baptism] [--lang fr] [--context "..."] \
     [--output simple|transcription] [--format gedcom] [-v]
 ```
 
-Prints the act as JSON (or GEDCOM 7 with `--format gedcom`) on stdout, warnings
-on stderr. The key is only read from the environment — never a CLI argument.
-`--provider`, `--model`, `--output` and `--format` override the defaults.
+Prints the act as JSON (or GEDCOM 7 with `--format gedcom`, or plain text with
+`--output transcription`) on stdout, warnings on stderr. The key is only read
+from the environment — never a CLI argument.
 
 ## Providers
 
@@ -194,8 +194,8 @@ To run `python -m tabellio` against a real provider while developing, export
 `TABELLIO_KEY` (and optionally `TABELLIO_PROVIDER` / `TABELLIO_MODEL`) in your
 shell, or use your own `direnv` / dotenv — the repo ships none.
 
-The `data/` directory holds example acts — **fictional or public-domain only**,
-see [`data/README.md`](data/README.md).
+The `examples/` directory holds a sample act and its extracted output —
+**fictional or public-domain only**, see [`examples/README.md`](examples/README.md).
 
 ## License
 
