@@ -77,6 +77,7 @@ def test_clean_act_no_warnings():
         {
             "type": "baptism",
             "date": {"raw": "x", "iso": "1710-04-04", "confidence": 0.95},
+            "transcription": "Le 4 avril 1710 a este baptisee Anne, nee ce jour.",
             "persons": [
                 {
                     "role": "subject",
@@ -119,8 +120,21 @@ def test_birth_act_not_flagged_for_missing_birth_date():
         {
             "type": "birth",
             "date": {"raw": "x", "iso": "1710-04-04", "confidence": 0.95},
+            "transcription": "Acte de naissance d'Anne, le 4 avril 1710.",
             "persons": [{"role": "subject", "given": {"value": "Anne", "confidence": 0.9}}],
         }
     )
     validate(act)
     assert act.warnings == []
+
+
+def test_missing_transcription_is_flagged():
+    act = Act.model_validate(
+        {
+            "type": "birth",
+            "date": {"raw": "x", "iso": "1710-04-04", "confidence": 0.95},
+            "persons": [{"role": "subject", "given": {"value": "Anne", "confidence": 0.9}}],
+        }
+    )
+    validate(act)
+    assert any("no verbatim transcription" in w for w in act.warnings)

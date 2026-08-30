@@ -30,6 +30,11 @@ Rules:
   `name_particle` and a generational suffix ("fils", "junior", "II") into
   `name_suffix`; the core family name goes in `surname`.
 - Never invent a name, date, place or fact that is not legible in the image.
+- `transcription`: the COMPLETE text of the act, word for word, in its own
+  language, keeping the original spelling and the line breaks. Do not paraphrase
+  or summarise. Write "[?]" for a single word you cannot read and "[illegible]"
+  for a longer unreadable passage. This is the diplomatic transcription; the
+  structured fields are extracted from it.
 - For each transcribed field give a `confidence` between 0 and 1.
 - Keep the act's own date (`date`: the baptism / burial / marriage ceremony or
   the registration) separate from the life events it records. For a baptism,
@@ -66,6 +71,9 @@ keys:
 - "persons": array of objects {"role", "given", "surname"} where role is one of
   subject, father, mother, groom, bride, witness, godparent, officiant,
   declarant, spouse, other
+- "transcription": the COMPLETE text of the act, word for word, in its own
+  language, original spelling and line breaks kept. Not paraphrased. "[?]" for a
+  single illegible word, "[illegible]" for a longer unreadable passage.
 
 Transcribe, do not translate: names and places stay in the language and spelling
 of the act (Latinised names stay Latinised). Use null for anything you cannot
@@ -81,6 +89,11 @@ _FULL_EXAMPLE = {
         "confidence": 0.9,
     },
     "place": {"value": "Villeneuve-sur-Exemple", "raw": "Villeneufve", "confidence": 0.7},
+    "transcription": (
+        "Le douziesme jour de may mil sept cens trois a este baptisee Jeanne\n"
+        "fille de Pierre Dupont laboureur et de Marie [?] sa femme nee la\n"
+        "veille. Parrain [illegible] marraine Anne Dupont."
+    ),
     "persons": [
         {
             "role": "subject",
@@ -127,6 +140,10 @@ _SIMPLE_EXAMPLE = {
         {"role": "father", "given": "Pierre", "surname": "Dupont"},
         {"role": "mother", "given": "Marie", "surname": None},
     ],
+    "transcription": (
+        "Le douziesme jour de may mil sept cens trois a este baptisee Jeanne\n"
+        "fille de Pierre Dupont laboureur et de Marie [?] sa femme."
+    ),
 }
 
 

@@ -100,5 +100,7 @@ def validate(act: Act) -> Act:
     _check_date_qualifiers(act, warnings)
     _check_event_date_captured(act, warnings)
     _check_low_confidence(act, warnings)
+    if not act.transcription:
+        warnings.append("no verbatim transcription produced")
     act.warnings = warnings
     return act

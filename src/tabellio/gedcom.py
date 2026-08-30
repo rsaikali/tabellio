@@ -18,6 +18,7 @@ Mapping notes:
   ``GREGORIAN``; a non-Gregorian ``calendar`` and the ``raw`` wording are kept
   in a ``PHRASE`` / ``NOTE``.
 - per-field ``confidence`` -> ``QUAY`` (0-3) on the source citation.
+- ``act.transcription`` (verbatim text) -> ``SOUR.TEXT``.
 - witnesses, godparents and the officiant -> ``ASSO`` + ``ROLE`` on the event.
 """
 
@@ -280,6 +281,8 @@ def to_gedcom(act: Act) -> str:
     # --- SOUR record ---------------------------------------------------------
     out.append(f"0 {src} SOUR")
     _emit(out, 1, "TITL", _source_title(act))
+    if act.transcription:
+        _emit(out, 1, "TEXT", act.transcription)
     if act.source_hint and str(act.source_hint) != "unknown":
         _emit(out, 1, "NOTE", f"register type: {act.source_hint}")
     if act.date and act.date.raw:

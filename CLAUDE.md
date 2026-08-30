@@ -54,7 +54,8 @@ Decision chain, in the order it was settled:
 | API key | **BYOK** — supplied by the caller, never stored, never logged. |
 | Config | Three env vars, each a fallback for a `parse()` arg (explicit arg wins): `TABELLIO_PROVIDER`, `TABELLIO_KEY`, `TABELLIO_MODEL`. Nothing else read from the environment. |
 | Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. All take `timeout=` (default 120s), `max_retries=0`. **NIM hosted endpoint rejects inline images >180 KB** (NVCF asset upload not implemented) → `NIMProvider` re-encodes in memory via `image.fit_within` (JPEG quality down, then downscale, long edge ≥ 1200 px; source untouched; loguru warning), or raises with `shrink=False`. Needs Pillow (`tabellio[nim]` / `tabellio[resize]`). Default model `meta/llama-3.2-11b-vision-instruct` (the 90B times out on the free tier) — small, hallucinates on cursive, use `output_mode="simple"`. **Gemini is the real path; NIM is runnable, not good.** |
-| Output | JSON validated by a **Pydantic** schema. `output_mode="full"` (default) -> `Act`; `output_mode="simple"` -> `ActSummary` (type/date/location/persons only), via a shorter prompt + its own schema. |
+| Output | JSON validated by a **Pydantic** schema. `output_mode="full"` (default) -> `Act`; `output_mode="simple"` -> `ActSummary` (type/date/location/persons + `transcription`), via a shorter prompt + its own schema. |
+| Transcription | `Act.transcription` / `ActSummary.transcription`: complete verbatim diplomatic transcription, source language + line breaks kept, `[?]` = one illegible word, `[illegible]` = a longer passage. Both modes. Full mode: `validate` warns if it is missing. GEDCOM: `SOUR.TEXT`. |
 | Serialisers | One `parse()` (the only network call). `act.model_dump_json()` = JSON. `tabellio.to_gedcom(act)` = a complete **GEDCOM 7.0** document (`gedcom.py`; conformance-checked in tests against the `gedcom7` lib). No YAML helper (one-liner + a dep). Schema is GEDCOM-mappable by design: `GenDate.qualifier`/`calendar`, `Person.name_particle`/`name_suffix`, `Role` → `ASSO.ROLE`. |
 | Ambiguity | No silent resolution: keep the original spelling, `qualifier` on every date, per-field `confidence`. |
 | Act language | **International.** Any language or script (French, Latin, German, Dutch, Spanish, …). **Transcribe, never translate**: `raw`/`value` free text stays in the source language, Latinised names stay Latinised. Only `type` and `role` are a fixed English vocabulary. `Act.language` = model-detected ISO 639-1 code (full mode only). Optional `act_language_hint=` / `--lang`, verified against the image like `act_type_hint`. |
@@ -68,6 +69,7 @@ An extracted act yields at least:
 - `type`: `birth` | `baptism` | `marriage` | `death` | `burial`
 - `date`: date **of the act** (the ceremony / registration) + raw spelling (`raw`), `confidence`
 - `place`: town / parish
+- `transcription`: complete verbatim text of the act, `[?]` / `[illegible]` for gaps
 - `persons[]`: role (subject, father, mother, groom, bride, witness, godparent…),
   `given` / `surname` / `name_particle` (SPFX) / `name_suffix` (NSFX), per-field
   `confidence`, plus the **life-event** dates and places on the person:

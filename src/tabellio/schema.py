@@ -148,6 +148,14 @@ class Act(BaseModel):
     type: ActType
     date: GenDate
     place: Cited[str] | None = None
+    transcription: str | None = Field(
+        default=None,
+        description=(
+            "Complete verbatim transcription of the act, in the source language with the "
+            "original spelling and line breaks preserved. '[?]' marks a single illegible "
+            "word, '[illegible]' a longer unreadable passage. Never paraphrased or summarised."
+        ),
+    )
     persons: list[Person] = Field(default_factory=list)
     other: list[Note] = Field(default_factory=list)
     source_hint: SourceHint = SourceHint.UNKNOWN
@@ -166,9 +174,10 @@ class Act(BaseModel):
 
 
 # --- output_mode="simple" -------------------------------------------------------
-# A deliberately bare projection: identity fields only. No raw spelling, no
-# confidence, no inference flags, no notes, no warnings. Produced by a shorter
-# prompt against its own schema, not derived from Act.
+# A deliberately bare projection: identity fields plus the verbatim
+# transcription. No raw spelling, no confidence, no qualifiers, no notes, no
+# warnings, no life-event dates. Produced by a shorter prompt against its own
+# schema, not derived from Act.
 
 
 class PersonSummary(BaseModel):
@@ -189,3 +198,11 @@ class ActSummary(BaseModel):
     )
     location: str | None = None
     persons: list[PersonSummary] = Field(default_factory=list)
+    transcription: str | None = Field(
+        default=None,
+        description=(
+            "Complete verbatim transcription of the act, source language and line breaks "
+            "preserved. '[?]' = one illegible word, '[illegible]' = a longer passage. Not "
+            "paraphrased."
+        ),
+    )

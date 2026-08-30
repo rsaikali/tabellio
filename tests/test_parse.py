@@ -76,6 +76,7 @@ def test_parse_simple_mode_returns_summary(png_bytes, fictional_summary, fake_pr
     assert act.date == "1812-01-03"
     assert act.location == "Bourg-Fictif"
     assert act.persons[0].given == "Anonyme"
+    assert act.transcription.startswith("L'an 1812")
     # simple mode uses its own shorter prompt, not the full one
     assert impl.calls[0]["system_prompt"] == _prompt.system_prompt("simple")
     assert impl.calls[0]["system_prompt"] != _prompt.system_prompt("full")

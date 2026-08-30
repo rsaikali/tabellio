@@ -13,6 +13,9 @@ JSON**.
   consistency rules, not from trusting the model.
 - **No silent resolution.** Original spelling is kept, every date carries a
   `qualifier` (exact / about / calculated / …), every field a `confidence`.
+- **Verbatim transcription too.** `act.transcription` holds the full diplomatic
+  text of the act, `[?]` for an illegible word — alongside the structured fields,
+  in both output modes.
 - **GEDCOM 7 out of the box.** `tabellio.to_gedcom(act)` — schema built to map
   cleanly to GEDCOM.
 - **Any language or script.** Text is transcribed in the language of the act
@@ -55,19 +58,20 @@ fields are `null` with a note — never guessed.
 
 ```python
 act = tabellio.parse("register-page.jpg", output_mode="simple")
-# ActSummary: type, date, location, persons[{role, given, surname}] — nothing else
+# ActSummary: type, date, location, persons[{role, given, surname}], transcription
 ```
 
 - `output_mode="full"` (default) — rich `Act`: raw spelling, per-field
-  `confidence`, date `qualifier`, validation `warnings`. `act.date` is the date
-  of the *act*; the subject's real **birth / death** (often a different day —
-  *"né la veille"*, *"décédé hier"*) lands on `persons[i].birth_date` /
-  `death_date` with `qualifier: "calculated"` + a note when deduced. `validate`
-  warns if a baptism or burial has no such date on its subject.
+  `confidence`, date `qualifier`, `transcription`, validation `warnings`.
+  `act.date` is the date of the *act*; the subject's real **birth / death**
+  (often a different day — *"né la veille"*, *"décédé hier"*) lands on
+  `persons[i].birth_date` / `death_date` with `qualifier: "calculated"` + a note
+  when deduced. `validate` warns if a baptism or burial has no such date on its
+  subject.
 - `output_mode="simple"` — sends a shorter prompt, returns a bare `ActSummary`:
-  `type`, `date` (ISO string or `null`), `location`, `persons`. No confidence,
-  no raw, no inference, no notes, no `language`, **no life-event dates** — use
-  full for those. Fewer tokens in and out.
+  `type`, `date` (ISO string or `null`), `location`, `persons`, plus the full
+  `transcription`. No confidence, no raw, no qualifiers, no notes, no
+  `language`, **no life-event dates** — use full for those.
 
 ### Hints
 

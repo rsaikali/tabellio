@@ -11,6 +11,10 @@ BAPTISM = {
     "place": {"value": "Villeneuve-sur-Exemple", "raw": "Villeneufve", "confidence": 0.7},
     "language": "fr",
     "source_hint": "parish",
+    "transcription": (
+        "Le douziesme jour de may 1703 a este baptisee Jeanne\n"
+        "fille de Pierre [?] Fontaine et de Marie sa femme."
+    ),
     "persons": [
         {
             "role": "subject",
@@ -132,6 +136,9 @@ def test_baptism_structure():
     assert "1 FAMC @F1@" in ged
     assert "1 CHIL @I1@" in ged
     assert "1 LANG fr" in ged
+    # the verbatim transcription -> SOUR.TEXT, line breaks -> CONT
+    assert "1 TEXT Le douziesme jour de may 1703 a este baptisee Jeanne" in ged
+    assert "2 CONT fille de Pierre [?] Fontaine et de Marie sa femme." in ged
 
 
 def test_marriage_structure():

@@ -43,12 +43,20 @@ def test_act_language_field(fictional_act):
     assert Act.model_validate(latin).language == "la"
 
 
+def test_act_transcription_field(fictional_act):
+    assert Act.model_validate(fictional_act).transcription is None
+    text = "L'an 1812, le 3 janvier, [?] est decede...\nsecond line."
+    act = Act.model_validate({**fictional_act, "transcription": text})
+    assert act.transcription == text
+
+
 def test_act_summary(fictional_summary):
     s = ActSummary.model_validate(fictional_summary)
     assert s.type == "death"
     assert s.date == "1812-01-03"
     assert s.persons[0].role is Role.SUBJECT
-    assert set(s.model_dump()) == {"type", "date", "location", "persons"}
+    assert set(s.model_dump()) == {"type", "date", "location", "persons", "transcription"}
+    assert s.transcription.startswith("L'an 1812")
 
 
 def test_act_summary_forbids_full_fields():
