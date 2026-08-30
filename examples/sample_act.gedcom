@@ -1,0 +1,61 @@
+0 HEAD
+1 GEDC
+2 VERS 7.0
+1 SOUR tabellio
+2 VERS 0.1.2
+1 DATE 30 AUG 2026
+1 LANG fr
+0 @S1@ SOUR
+1 TITL Burial of Joseph Commal (1757)
+1 TEXT Le vingt deuxieme jour de Decembre mil
+2 CONT Sept cent cinquante sept a été inhumé dans le
+2 CONT cimetiere de cette paroisse le corps de joseph
+2 CONT commal decedé d'hier au village de evannieu
+2 CONT agé d'environ soixante treize ans; En presence
+2 CONT julien commal, louis oheux et autres qui ne
+2 CONT signent.
+2 CONT J: caillon vicaire
+1 NOTE register type: parish
+1 NOTE act dated: "Le vingt deuxieme jour de Decembre mil Sept cent cinquante sept"
+1 NOTE [margin] Sep de Joseph Commal
+0 @I1@ INDI
+1 NAME Joseph /Commal/
+2 GIVN Joseph
+2 SURN Commal
+1 SEX M
+1 BURI
+2 DATE 22 DEC 1757
+3 PHRASE Le vingt deuxieme jour de Decembre mil Sept cent cinquante sept
+2 NOTE age stated: "73 ans"
+2 ASSO @I2@
+3 ROLE WITN
+2 ASSO @I3@
+3 ROLE WITN
+2 ASSO @I4@
+3 ROLE OFFICIATOR
+2 SOUR @S1@
+3 QUAY 3
+1 DEAT
+2 DATE CAL 21 DEC 1757
+3 PHRASE decedé d'hier
+2 NOTE Died the day before the burial act on 22 December 1757
+2 PLAC Evannieu
+2 SOUR @S1@
+3 QUAY 3
+0 @I2@ INDI
+1 NAME Julien /Commal/
+2 GIVN Julien
+2 SURN Commal
+1 SEX U
+0 @I3@ INDI
+1 NAME Louis /Oheux/
+2 GIVN Louis
+2 SURN Oheux
+1 SEX U
+0 @I4@ INDI
+1 NAME J. /Caillon/
+2 GIVN J.
+2 SURN Caillon
+1 SEX U
+1 OCCU vicaire
+0 TRLR

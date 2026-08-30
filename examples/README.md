@@ -17,11 +17,11 @@ Never a user-supplied scan, never a family act. See the project `CLAUDE.md`.
 
 | File | What |
 |---|---|
-| `sample_act.jpg` | A 1757 burial act (Joseph Bommal). Public-domain, >120 years. |
-| `sample_act.full.json` | `tabellio.parse(..., output_mode="full")` output *(to be added)* |
-| `sample_act.simple.json` | `output_mode="simple"` output *(to be added)* |
-| `sample_act.transcription.json` | `output_mode="transcription"` output *(to be added)* |
+| `sample_act.jpg` | A 1757 parish burial act (Joseph Bommal — the initial reads ambiguously B/C). Public-domain, >120 years. |
+| `sample_act.full.json` | `parse(..., output_mode="full")` |
+| `sample_act.simple.json` | `parse(..., output_mode="simple")` |
+| `sample_act.transcription.json` | `parse(..., output_mode="transcription")` |
+| `sample_act.gedcom` | `to_gedcom(parse(...))` — GEDCOM 7.0 |
 
-The `.json` files are committed reference output produced with `gemini` — regenerate
-and review them by hand when the schema or the prompts change, they are not
-asserted by the test suite.
+Reference output produced with `gemini`. Not asserted by the test suite —
+regenerate and eyeball them when the schema or the prompts change.

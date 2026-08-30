@@ -65,13 +65,15 @@ export TABELLIO_KEY=...
 for mode in full simple transcription; do
     python -m tabellio examples/sample_act.jpg --output "$mode"
 done
+python -m tabellio examples/sample_act.jpg --format gedcom
 ```
 
-| Mode | Output | What you get |
+| Run | Output | What you get |
 |---|---|---|
-| `full` | [`sample_act.full.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
-| `simple` | [`sample_act.simple.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.simple.json) | `type` / `date` / `location` / `persons` only |
-| `transcription` | [`sample_act.transcription.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.transcription.json) | the verbatim text + detected language |
+| `--output full` | [`sample_act.full.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
+| `--output simple` | [`sample_act.simple.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.simple.json) | `type` / `date` / `location` / `persons` only |
+| `--output transcription` | [`sample_act.transcription.json`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.transcription.json) | the verbatim text + detected language |
+| `--format gedcom` | [`sample_act.gedcom`](https://github.com/rsaikali/tabellio/blob/main/examples/sample_act.gedcom) | a GEDCOM 7.0 document — `SOUR` + `INDI` (deceased + witnesses + officiant) + `BURI` / derived `DEAT` events |
 
 ## Use
 
