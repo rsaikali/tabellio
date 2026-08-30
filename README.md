@@ -3,7 +3,16 @@
 Turn an image of a civil-registry or parish record into **validated structured
 JSON**.
 
-> *tabellio*: the Roman / medieval scribe who officially drafted legal acts.
+> *tabellio*: the Roman / medieval scribe who officially drafted legal acts —
+> the *vieux tabellion* Georges Brassens addresses in *Supplique pour être
+> enterré sur la plage de Sète* (1966):
+>
+> > *Trempe dans l'encre bleue du Golfe du Lion,*
+> > *Trempe, trempe ta plume, ô mon vieux tabellion,*
+> > *Et de ta plus belle écriture,*
+> > *Note ce qu'il faudrait qu'il advînt de mon corps…*
+>
+> This library reads back what that pen wrote.
 
 - **BYOK** — you pass your own VLM API key; it is never stored, never logged.
 - **Provider-agnostic** — Gemini, OpenAI, NVIDIA NIM, Anthropic, or a local
@@ -25,7 +34,7 @@ JSON**.
 
 ## Example
 
-A parish burial act from 1757 (Joseph Bommal) — a public-domain register page,
+A parish burial act from 1757, a public-domain register page,
 [`examples/sample_act.jpg`](examples/sample_act.jpg):
 
 ![1757 burial act](examples/sample_act.jpg)
