@@ -23,6 +23,28 @@ JSON**.
   `type` / `role` vocabulary is fixed English. The detected language is recorded
   on `act.language`.
 
+## Example
+
+A parish burial act from 1757 (Joseph Bommal) — a public-domain register page,
+[`examples/3.jpg`](examples/3.jpg):
+
+![1757 burial act](examples/3.jpg)
+
+```bash
+export TABELLIO_KEY=...
+for mode in full simple transcription; do
+    python -m tabellio examples/3.jpg --hint burial --output "$mode"
+done
+```
+
+| Mode | Output | What you get |
+|---|---|---|
+| `full` | [`3.full.json`](examples/3.full.json) | every field, `raw` spelling, `confidence`, date `qualifier`, `transcription`, `warnings` |
+| `simple` | [`3.simple.json`](examples/3.simple.json) | `type` / `date` / `location` / `persons` only |
+| `transcription` | [`3.transcription.json`](examples/3.transcription.json) | the verbatim text + detected language |
+
+*(The `.json` files land once the reference run against `gemini` is done.)*
+
 ## Install
 
 ```bash
