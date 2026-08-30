@@ -190,13 +190,19 @@ argument.
 
 ## Providers
 
-| `provider=` | Extra | Default model |
-|---|---|---|
-| `gemini` | `tabellio[gemini]` | `gemini-3.6-flash` |
-| `openai` | `tabellio[openai]` | `gpt-4o` |
-| `nim` | `tabellio[nim]` (pulls Pillow) | `meta/llama-3.2-11b-vision-instruct` |
-| `anthropic` | `tabellio[anthropic]` | `claude-sonnet-4` |
-| `ollama` | `tabellio[ollama]` | `llama3.2-vision` (local, no key) |
+| `provider=` | Extra | Default model | Free tier |
+|---|---|---|---|
+| `gemini` | `tabellio[gemini]` | `gemini-3.6-flash` | **yes**, no card — best on acts |
+| `mistral` | `tabellio[mistral]` | `mistral-small-latest` | **yes**, phone verify — decent |
+| `openai` | `tabellio[openai]` | `gpt-4o` | no |
+| `anthropic` | `tabellio[anthropic]` | `claude-sonnet-4` | no |
+| `nim` | `tabellio[nim]` (pulls Pillow) | `meta/llama-3.2-11b-vision-instruct` | yes, but slow / weak here |
+| `ollama` | `tabellio[ollama]` | `llama3.2-vision` | local, no key |
+
+For a no-cost run: `gemini` (best) or `mistral` (`mistral-medium-latest` reads
+harder hands better than the `small` default). `openai` / `anthropic` are
+OpenAI/Anthropic-compatible so third-party gateways (Groq, OpenRouter, GitHub
+Models) work via `provider="openai", base_url=...` with no extra code.
 
 Set `TABELLIO_MODEL` (or pass `model=`) to switch model — quality vs speed is
 your call. Keyword options pass straight through: `timeout=` (seconds, default

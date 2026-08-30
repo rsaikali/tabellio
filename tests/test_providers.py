@@ -7,7 +7,14 @@ from tabellio.providers import available_providers, get_provider
 
 
 def test_registry_lists_all_providers():
-    assert available_providers() == ["anthropic", "gemini", "nim", "ollama", "openai"]
+    assert available_providers() == [
+        "anthropic",
+        "gemini",
+        "mistral",
+        "nim",
+        "ollama",
+        "openai",
+    ]
 
 
 def test_unknown_provider():

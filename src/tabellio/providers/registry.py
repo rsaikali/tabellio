@@ -38,6 +38,7 @@ _REGISTRY: dict[str, str] = {
     "openai": "tabellio.providers.openai:OpenAIProvider",
     "nim": "tabellio.providers.nim:NIMProvider",
     "anthropic": "tabellio.providers.anthropic:AnthropicProvider",
+    "mistral": "tabellio.providers.mistral:MistralProvider",
     "ollama": "tabellio.providers.ollama:OllamaProvider",
 }
 

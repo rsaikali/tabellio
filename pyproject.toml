@@ -40,9 +40,17 @@ gemini = ["google-genai>=0.3"]
 openai = ["openai>=1.30"]
 nim = ["openai>=1.30", "pillow>=10"]
 anthropic = ["anthropic>=0.34"]
+mistral = ["mistralai>=2,<3"]
 ollama = ["ollama>=0.3"]
 resize = ["pillow>=10"]
-all = ["google-genai>=0.3", "openai>=1.30", "anthropic>=0.34", "ollama>=0.3", "pillow>=10"]
+all = [
+    "google-genai>=0.3",
+    "openai>=1.30",
+    "anthropic>=0.34",
+    "mistralai>=2,<3",
+    "ollama>=0.3",
+    "pillow>=10",
+]
 
 [dependency-groups]
 dev = [

@@ -53,7 +53,7 @@ Decision chain, in the order it was settled:
 | Model | No embedded / trained model. Calls a third-party VLM via a provider adapter. |
 | API key | **BYOK** — supplied by the caller, never stored, never logged. |
 | Config | Three env vars, each a fallback for a `parse()` arg (explicit arg wins): `TABELLIO_PROVIDER`, `TABELLIO_KEY`, `TABELLIO_MODEL`. Nothing else read from the environment. |
-| Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. All take `timeout=` (default 120s), `max_retries=0`. **NIM hosted endpoint rejects inline images >180 KB** (NVCF asset upload not implemented) → `NIMProvider` re-encodes in memory via `image.fit_within` (JPEG quality down, then downscale, long edge ≥ 1200 px; source untouched; loguru warning), or raises with `shrink=False`. Needs Pillow (`tabellio[nim]` / `tabellio[resize]`). Default model `meta/llama-3.2-11b-vision-instruct` (the 90B times out on the free tier) — small, hallucinates on cursive, use `output_mode="simple"`. **Gemini is the real path; NIM is runnable, not good.** |
+| Providers | Thin multi-provider adapter: Gemini, Mistral, OpenAI, Anthropic, NIM, Ollama (optional local). None required at install. Free tiers (no cost): **Gemini** (best on acts) and **Mistral** (`mistral-small-latest` default, `pixtral-*` deprecated → vision folded into Small/Medium). `mistral` uses the `mistralai` 2.x SDK (`from mistralai.client import Mistral`). All take `timeout=` (default 120s), `max_retries=0`. **NIM hosted endpoint rejects inline images >180 KB** (NVCF asset upload not implemented) → `NIMProvider` re-encodes in memory via `image.fit_within` (JPEG quality down, then downscale, long edge ≥ 1200 px; source untouched; loguru warning), or raises with `shrink=False`. Needs Pillow (`tabellio[nim]` / `tabellio[resize]`). Default model `meta/llama-3.2-11b-vision-instruct` (the 90B times out on the free tier) — small, hallucinates on cursive, use `output_mode="simple"`. **Gemini is the real path; NIM is runnable, not good.** |
 | Output | JSON validated by a **Pydantic** schema. Three `output_mode`s, each its own prompt + target model: `"full"` (default) -> `Act`; `"simple"` -> `ActSummary` (type/date/location/persons, nothing else); `"transcription"` -> `Transcription` (verbatim `text` + `language`). |
 | Transcription | Complete verbatim diplomatic transcription, source language + line breaks kept, `[?]` = one illegible word, `[illegible]` = a longer passage. As `Act.transcription` in full mode (`validate` warns if missing; GEDCOM `SOUR.TEXT`) or as the whole result in `"transcription"` mode. **Not** in `simple`. |
 | Serialisers | One `parse()` (the only network call). `act.model_dump_json()` = JSON. `tabellio.to_gedcom(act)` = a complete **GEDCOM 7.0** document (`gedcom.py`; conformance-checked in tests against the `gedcom7` lib). No YAML helper (one-liner + a dep). Schema is GEDCOM-mappable by design: `GenDate.qualifier`/`calendar`, `Person.name_particle`/`name_suffix`, `Role` → `ASSO.ROLE`. |
@@ -98,7 +98,7 @@ this table is intent only.
 ## Target architecture
 
 ```
-tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
+tabellio.parse(image, provider="gemini"|"mistral"|"openai"|"anthropic"|"nim"|"ollama",
                api_key=..., model=None, act_type_hint=None, act_language_hint=None,
                context=None, output_mode="full"|"simple"|"transcription")
     -> Act | ActSummary | Transcription   # Pydantic
