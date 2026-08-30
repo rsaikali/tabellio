@@ -6,11 +6,19 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-08-30
+
 ### Added
 
 - `mistral` provider (`pip install 'tabellio[mistral]'`) — Mistral's multimodal
   models via the `mistralai` 2.x SDK. Default `mistral-small-latest`. Paid;
   `gemini` remains the free option.
+
+### Docs
+
+- README providers table gains a cost column; notes that `gemini`'s AI Studio
+  free tier is the no-cost path and that OpenAI-compatible gateways (Groq,
+  OpenRouter, GitHub Models) work via `provider="openai", base_url=...`.
 
 ## [0.1.1] - 2026-08-30
 
@@ -50,6 +58,7 @@ First public release (TestPyPI rehearsal only).
 - `python -m tabellio <image>` CLI with `--provider` / `--model` / `--hint` /
   `--lang` / `--context` / `--output` / `--format` / `--no-validate` / `-v`.
 
-[Unreleased]: https://github.com/rsaikali/tabellio/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/rsaikali/tabellio/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/rsaikali/tabellio/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/rsaikali/tabellio/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/rsaikali/tabellio/releases/tag/v0.1.0
