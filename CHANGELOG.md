@@ -9,8 +9,8 @@ All notable changes to this project are documented here. The format follows
 ### Added
 
 - `mistral` provider (`pip install 'tabellio[mistral]'`) — Mistral's multimodal
-  models via the `mistralai` 2.x SDK. Default `mistral-small-latest`; a second
-  no-credit-card free tier next to `gemini`.
+  models via the `mistralai` 2.x SDK. Default `mistral-small-latest`. Paid;
+  `gemini` remains the free option.
 
 ## [0.1.1] - 2026-08-30
 

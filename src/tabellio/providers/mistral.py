@@ -1,11 +1,10 @@
 """Mistral provider (``pip install 'tabellio[mistral]'``).
 
-Mistral's *La Plateforme* has a no-credit-card free tier that includes the
-multimodal models, which makes this a reasonable second free option next to
-``gemini`` for a demo. The default ``mistral-small-latest`` is fast and cheap;
-``mistral-medium-latest`` reads harder hands better. (The old ``pixtral-*``
-models are deprecated -- their vision is folded into Small / Medium now.)
-Heavy old cursive is still better served by ``gemini``.
+Paid (Mistral has no free tier as of writing). The default
+``mistral-small-latest`` is fast and cheap; ``mistral-medium-latest`` reads
+harder hands better. The old ``pixtral-*`` models are deprecated -- their vision
+is folded into Small / Medium now. Heavy old cursive is still better served by
+``gemini``.
 """
 
 from __future__ import annotations
