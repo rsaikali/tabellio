@@ -26,6 +26,7 @@ from tabellio.schema import (
     Person,
     PersonSummary,
     Role,
+    Transcription,
 )
 
 __version__ = "0.0.1"
@@ -47,6 +48,7 @@ __all__ = [
     "Role",
     "SchemaMismatch",
     "TabellioError",
+    "Transcription",
     "__version__",
     "parse",
     "to_gedcom",

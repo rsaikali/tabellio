@@ -1,16 +1,17 @@
 """The extraction prompts and few-shot examples.
 
-Two output modes, each with its own system prompt, few-shot and target schema:
+Three output modes, each with its own system prompt, few-shot and target schema:
 
-- ``full``  -> :class:`tabellio.schema.Act` (raw spelling, confidence, notes).
-- ``simple`` -> :class:`tabellio.schema.ActSummary` (identity fields only).
+- ``full``          -> :class:`tabellio.schema.Act` (raw spelling, confidence, notes).
+- ``simple``        -> :class:`tabellio.schema.ActSummary` (identity fields only).
+- ``transcription`` -> :class:`tabellio.schema.Transcription` (verbatim text only).
 """
 
 from __future__ import annotations
 
 import json
 
-from tabellio.schema import Act, ActSummary
+from tabellio.schema import Act, ActSummary, Transcription
 
 _FULL_SYSTEM = """\
 You are a palaeographer transcribing a single archival vital record (civil
@@ -71,14 +72,25 @@ keys:
 - "persons": array of objects {"role", "given", "surname"} where role is one of
   subject, father, mother, groom, bride, witness, godparent, officiant,
   declarant, spouse, other
-- "transcription": the COMPLETE text of the act, word for word, in its own
-  language, original spelling and line breaks kept. Not paraphrased. "[?]" for a
-  single illegible word, "[illegible]" for a longer unreadable passage.
 
 Transcribe, do not translate: names and places stay in the language and spelling
 of the act (Latinised names stay Latinised). Use null for anything you cannot
 read. Do not guess, do not explain. No extra keys. Output JSON only, no markdown
 fences.
+"""
+
+_TRANSCRIPTION_SYSTEM = """\
+You are a palaeographer transcribing a single archival vital record from an
+image, in any language or script. Return a strict JSON object with EXACTLY two
+keys:
+
+- "text": the COMPLETE text of the act, word for word, in its own language, with
+  the original spelling and line breaks kept. Never paraphrase or summarise.
+  Write "[?]" for a single word you cannot read and "[illegible]" for a longer
+  unreadable passage.
+- "language": the act's main language as an ISO 639-1 code ("fr", "la", "de"...).
+
+Output JSON only. No prose, no markdown fences.
 """
 
 _FULL_EXAMPLE = {
@@ -140,25 +152,37 @@ _SIMPLE_EXAMPLE = {
         {"role": "father", "given": "Pierre", "surname": "Dupont"},
         {"role": "mother", "given": "Marie", "surname": None},
     ],
-    "transcription": (
+}
+
+_TRANSCRIPTION_EXAMPLE = {
+    "text": (
         "Le douziesme jour de may mil sept cens trois a este baptisee Jeanne\n"
-        "fille de Pierre Dupont laboureur et de Marie [?] sa femme."
+        "fille de Pierre Dupont laboureur et de Marie [?] sa femme nee la\n"
+        "veille. Parrain [illegible] marraine Anne Dupont."
     ),
+    "language": "fr",
+}
+
+
+_SYSTEM = {
+    "full": _FULL_SYSTEM,
+    "simple": _SIMPLE_SYSTEM,
+    "transcription": _TRANSCRIPTION_SYSTEM,
 }
 
 
 def system_prompt(output_mode: str) -> str:
-    return _SIMPLE_SYSTEM if output_mode == "simple" else _FULL_SYSTEM
+    return _SYSTEM[output_mode]
 
 
 def few_shot(output_mode: str) -> list[dict[str, str]]:
     """Few-shot turns as chat messages (fictional act, no real person)."""
-    if output_mode == "simple":
-        example = ActSummary.model_validate(_SIMPLE_EXAMPLE)
-        payload = example.model_dump_json()
+    if output_mode == "transcription":
+        payload = Transcription.model_validate(_TRANSCRIPTION_EXAMPLE).model_dump_json()
+    elif output_mode == "simple":
+        payload = ActSummary.model_validate(_SIMPLE_EXAMPLE).model_dump_json()
     else:
-        example = Act.model_validate(_FULL_EXAMPLE)
-        payload = example.model_dump_json(exclude_none=True)
+        payload = Act.model_validate(_FULL_EXAMPLE).model_dump_json(exclude_none=True)
     return [
         {"role": "user", "content": "[image of a 1703 baptism record]"},
         {"role": "assistant", "content": payload},
@@ -178,6 +202,8 @@ def user_prompt(
             f"\nThe caller believes the act is written in {act_language_hint}; "
             "verify against the image."
         )
+    if output_mode == "transcription":
+        return "Transcribe the complete text of the act in this image, as the JSON above." + hints
     if output_mode == "simple":
         return "Transcribe the act in this image as the concise JSON described above." + hints
     schema = json.dumps(Act.model_json_schema(), ensure_ascii=False)

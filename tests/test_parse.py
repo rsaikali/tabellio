@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from tabellio import ActSummary, parse
+from tabellio import ActSummary, Transcription, parse
 from tabellio import prompt as _prompt
 from tabellio.errors import SchemaMismatch
 
@@ -76,7 +76,7 @@ def test_parse_simple_mode_returns_summary(png_bytes, fictional_summary, fake_pr
     assert act.date == "1812-01-03"
     assert act.location == "Bourg-Fictif"
     assert act.persons[0].given == "Anonyme"
-    assert act.transcription.startswith("L'an 1812")
+    assert not hasattr(act, "transcription")
     # simple mode uses its own shorter prompt, not the full one
     assert impl.calls[0]["system_prompt"] == _prompt.system_prompt("simple")
     assert impl.calls[0]["system_prompt"] != _prompt.system_prompt("full")
@@ -88,6 +88,24 @@ def test_parse_simple_mode_has_no_meta_or_warnings(png_bytes, fictional_summary,
     assert not hasattr(act, "warnings")
     assert not hasattr(act, "provider")
     assert not hasattr(act, "confidence")
+
+
+def test_parse_transcription_mode(png_bytes, fictional_transcription, fake_provider):
+    impl = fake_provider(json.dumps(fictional_transcription))
+    result = parse(png_bytes, provider="fake", api_key="k", output_mode="transcription")
+    assert isinstance(result, Transcription)
+    assert result.text.startswith("L'an 1812")
+    assert result.language == "fr"
+    assert not hasattr(result, "warnings")
+    assert impl.calls[0]["system_prompt"] == _prompt.system_prompt("transcription")
+
+
+def test_parse_transcription_mode_rejects_structured_payload(
+    png_bytes, fictional_summary, fake_provider
+):
+    fake_provider(json.dumps(fictional_summary))
+    with pytest.raises(SchemaMismatch):
+        parse(png_bytes, provider="fake", api_key="k", output_mode="transcription")
 
 
 def test_parse_simple_mode_rejects_full_payload(png_bytes, fictional_act, fake_provider):

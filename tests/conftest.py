@@ -36,7 +36,11 @@ FICTIONAL_SUMMARY = {
     "persons": [
         {"role": "subject", "given": "Anonyme", "surname": "Untel"},
     ],
-    "transcription": "L'an 1812, le 3 janvier, est decede Anonyme Untel a Bourg-Fictif.",
+}
+
+FICTIONAL_TRANSCRIPTION = {
+    "text": "L'an 1812, le 3 janvier, est decede Anonyme Untel a Bourg-Fictif [?].",
+    "language": "fr",
 }
 
 
@@ -60,6 +64,11 @@ def fictional_act() -> dict:
 @pytest.fixture
 def fictional_summary() -> dict:
     return dict(FICTIONAL_SUMMARY)
+
+
+@pytest.fixture
+def fictional_transcription() -> dict:
+    return dict(FICTIONAL_TRANSCRIPTION)
 
 
 class FakeProvider:

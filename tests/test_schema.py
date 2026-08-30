@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from tabellio.schema import Act, ActSummary, Cited, Person, Role
+from tabellio.schema import Act, ActSummary, Cited, Person, Role, Transcription
 
 
 def test_act_roundtrip(fictional_act):
@@ -55,8 +55,18 @@ def test_act_summary(fictional_summary):
     assert s.type == "death"
     assert s.date == "1812-01-03"
     assert s.persons[0].role is Role.SUBJECT
-    assert set(s.model_dump()) == {"type", "date", "location", "persons", "transcription"}
-    assert s.transcription.startswith("L'an 1812")
+    assert set(s.model_dump()) == {"type", "date", "location", "persons"}
+
+
+def test_transcription_model(fictional_transcription):
+    t = Transcription.model_validate(fictional_transcription)
+    assert t.text.startswith("L'an 1812")
+    assert t.language == "fr"
+
+
+def test_transcription_requires_text():
+    with pytest.raises(ValidationError):
+        Transcription.model_validate({"language": "fr"})
 
 
 def test_act_summary_forbids_full_fields():

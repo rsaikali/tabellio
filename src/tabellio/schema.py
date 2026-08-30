@@ -173,11 +173,28 @@ class Act(BaseModel):
     )
 
 
+# --- output_mode="transcription" ----------------------------------------------
+# Just the verbatim text, nothing structured.
+
+
+class Transcription(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    text: str = Field(
+        description=(
+            "Complete verbatim transcription of the act, source language and line breaks "
+            "preserved. '[?]' = one illegible word, '[illegible]' = a longer passage. Not "
+            "paraphrased."
+        ),
+    )
+    language: str | None = Field(default=None, description="ISO 639-1 code, model-detected.")
+
+
 # --- output_mode="simple" -------------------------------------------------------
-# A deliberately bare projection: identity fields plus the verbatim
-# transcription. No raw spelling, no confidence, no qualifiers, no notes, no
-# warnings, no life-event dates. Produced by a shorter prompt against its own
-# schema, not derived from Act.
+# A deliberately bare projection: identity fields only. No raw spelling, no
+# confidence, no qualifiers, no notes, no warnings, no life-event dates, no
+# transcription (use output_mode="transcription" or "full"). Produced by a
+# shorter prompt against its own schema, not derived from Act.
 
 
 class PersonSummary(BaseModel):
@@ -198,11 +215,3 @@ class ActSummary(BaseModel):
     )
     location: str | None = None
     persons: list[PersonSummary] = Field(default_factory=list)
-    transcription: str | None = Field(
-        default=None,
-        description=(
-            "Complete verbatim transcription of the act, source language and line breaks "
-            "preserved. '[?]' = one illegible word, '[illegible]' = a longer passage. Not "
-            "paraphrased."
-        ),
-    )

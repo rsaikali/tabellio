@@ -15,7 +15,7 @@ from loguru import logger
 from tabellio import parse, to_gedcom
 from tabellio.errors import TabellioError
 from tabellio.providers import available_providers
-from tabellio.schema import Act
+from tabellio.schema import Act, Transcription
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -47,8 +47,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--output",
         default="full",
-        choices=["full", "simple"],
-        help="full: rich Act with confidence/notes/warnings; simple: bare summary",
+        choices=["full", "simple", "transcription"],
+        help="full: rich Act; simple: bare summary; transcription: verbatim text only",
     )
     ap.add_argument(
         "--format",
@@ -80,6 +80,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.format == "gedcom" and isinstance(act, Act):
         print(to_gedcom(act), end="")
+    elif isinstance(act, Transcription):
+        print(act.text)
     else:
         print(act.model_dump_json(indent=2, exclude_none=True))
     warnings = getattr(act, "warnings", [])

@@ -13,7 +13,7 @@ from tabellio import prompt as _prompt
 from tabellio.errors import SchemaMismatch
 from tabellio.image import ImageInput, load_image
 from tabellio.providers import DEFAULT_PROVIDER, get_provider
-from tabellio.schema import Act, ActSummary
+from tabellio.schema import Act, ActSummary, Transcription
 from tabellio.validate import validate as _validate
 
 #: The only three environment variables tabellio itself reads. Each is a
@@ -22,8 +22,8 @@ ENV_PROVIDER = "TABELLIO_PROVIDER"
 ENV_KEY = "TABELLIO_KEY"
 ENV_MODEL = "TABELLIO_MODEL"
 
-OutputMode = Literal["full", "simple"]
-_TARGET = {"full": Act, "simple": ActSummary}
+OutputMode = Literal["full", "simple", "transcription"]
+_TARGET: dict[str, type] = {"full": Act, "simple": ActSummary, "transcription": Transcription}
 
 
 def _strip_fences(text: str) -> str:
@@ -52,7 +52,7 @@ def parse(
     output_mode: OutputMode = "full",
     validate: bool = True,
     **provider_options: object,
-) -> Act | ActSummary:
+) -> Act | ActSummary | Transcription:
     """Extract a structured act from an image of a single record.
 
     Parameters
@@ -77,20 +77,23 @@ def parse(
         language on ``act.language``. Text is transcribed in the source
         language, never translated.
     output_mode:
-        ``"full"`` (default) returns a rich :class:`~tabellio.schema.Act` with
-        raw spelling, per-field ``confidence``, inference flags and validation
-        ``warnings``. ``"simple"`` sends a shorter prompt and returns a bare
-        :class:`~tabellio.schema.ActSummary` -- ``type``, ``date``,
-        ``location``, ``persons`` (role / given / surname) and nothing else.
+        - ``"full"`` (default): a rich :class:`~tabellio.schema.Act` -- raw
+          spelling, per-field ``confidence``, date ``qualifier``,
+          ``transcription``, validation ``warnings``.
+        - ``"simple"``: a bare :class:`~tabellio.schema.ActSummary` -- ``type``,
+          ``date``, ``location``, ``persons`` (role / given / surname), nothing
+          else. Shorter prompt, fewer tokens.
+        - ``"transcription"``: just :class:`~tabellio.schema.Transcription`
+          (``text`` + detected ``language``) -- the verbatim text, no structure.
     validate:
         Run :mod:`tabellio.validate` consistency rules and fill ``act.warnings``.
-        Ignored in ``output_mode="simple"``.
+        ``"full"`` only.
     **provider_options:
         Passed straight to the provider, e.g. ``timeout`` (seconds, default 120),
         ``base_url``, ``host``, ``max_tokens``.
     """
     if output_mode not in _TARGET:
-        raise ValueError(f"output_mode must be 'full' or 'simple', got {output_mode!r}")
+        raise ValueError(f"output_mode must be one of {sorted(_TARGET)}, got {output_mode!r}")
 
     provider = _pick(provider, ENV_PROVIDER, DEFAULT_PROVIDER)
     api_key = _pick(api_key, ENV_KEY)
@@ -132,8 +135,8 @@ def parse(
             raw=payload,
         ) from exc
 
-    if isinstance(result, ActSummary):
-        return result
+    if not isinstance(result, Act):
+        return result  # ActSummary / Transcription -- no meta, no validation
 
     result.provider = provider
     return _validate(result) if validate else result

@@ -54,8 +54,8 @@ Decision chain, in the order it was settled:
 | API key | **BYOK** — supplied by the caller, never stored, never logged. |
 | Config | Three env vars, each a fallback for a `parse()` arg (explicit arg wins): `TABELLIO_PROVIDER`, `TABELLIO_KEY`, `TABELLIO_MODEL`. Nothing else read from the environment. |
 | Providers | Thin multi-provider adapter: NIM, Gemini, OpenAI, Anthropic, Ollama (optional local). None required at install. All take `timeout=` (default 120s), `max_retries=0`. **NIM hosted endpoint rejects inline images >180 KB** (NVCF asset upload not implemented) → `NIMProvider` re-encodes in memory via `image.fit_within` (JPEG quality down, then downscale, long edge ≥ 1200 px; source untouched; loguru warning), or raises with `shrink=False`. Needs Pillow (`tabellio[nim]` / `tabellio[resize]`). Default model `meta/llama-3.2-11b-vision-instruct` (the 90B times out on the free tier) — small, hallucinates on cursive, use `output_mode="simple"`. **Gemini is the real path; NIM is runnable, not good.** |
-| Output | JSON validated by a **Pydantic** schema. `output_mode="full"` (default) -> `Act`; `output_mode="simple"` -> `ActSummary` (type/date/location/persons + `transcription`), via a shorter prompt + its own schema. |
-| Transcription | `Act.transcription` / `ActSummary.transcription`: complete verbatim diplomatic transcription, source language + line breaks kept, `[?]` = one illegible word, `[illegible]` = a longer passage. Both modes. Full mode: `validate` warns if it is missing. GEDCOM: `SOUR.TEXT`. |
+| Output | JSON validated by a **Pydantic** schema. Three `output_mode`s, each its own prompt + target model: `"full"` (default) -> `Act`; `"simple"` -> `ActSummary` (type/date/location/persons, nothing else); `"transcription"` -> `Transcription` (verbatim `text` + `language`). |
+| Transcription | Complete verbatim diplomatic transcription, source language + line breaks kept, `[?]` = one illegible word, `[illegible]` = a longer passage. As `Act.transcription` in full mode (`validate` warns if missing; GEDCOM `SOUR.TEXT`) or as the whole result in `"transcription"` mode. **Not** in `simple`. |
 | Serialisers | One `parse()` (the only network call). `act.model_dump_json()` = JSON. `tabellio.to_gedcom(act)` = a complete **GEDCOM 7.0** document (`gedcom.py`; conformance-checked in tests against the `gedcom7` lib). No YAML helper (one-liner + a dep). Schema is GEDCOM-mappable by design: `GenDate.qualifier`/`calendar`, `Person.name_particle`/`name_suffix`, `Role` → `ASSO.ROLE`. |
 | Ambiguity | No silent resolution: keep the original spelling, `qualifier` on every date, per-field `confidence`. |
 | Act language | **International.** Any language or script (French, Latin, German, Dutch, Spanish, …). **Transcribe, never translate**: `raw`/`value` free text stays in the source language, Latinised names stay Latinised. Only `type` and `role` are a fixed English vocabulary. `Act.language` = model-detected ISO 639-1 code (full mode only). Optional `act_language_hint=` / `--lang`, verified against the image like `act_type_hint`. |
@@ -86,8 +86,9 @@ An extracted act yields at least:
 - unread fields → absent or `null` + note, **never guessed**
 
 `output_mode="simple"` yields only `type`, `date` (ISO string or `null`),
-`location`, `persons[{role, given, surname}]` — no raw, confidence, inference,
-notes, warnings. Separate prompt (`_SIMPLE_SYSTEM`) + schema (`ActSummary`), not
+`location`, `persons[{role, given, surname}]` — no raw, confidence, qualifiers,
+transcription, warnings. `output_mode="transcription"` yields only
+`{text, language}`. Each mode has its own `_*_SYSTEM` prompt + target model, not
 a projection of `Act`.
 
 The exact schema lives in code (`tabellio/schema.py` or similar), not here —
@@ -98,7 +99,8 @@ this table is intent only.
 ```
 tabellio.parse(image, provider="gemini"|"nim"|"openai"|"anthropic"|"ollama",
                api_key=..., model=None, act_type_hint=None, act_language_hint=None,
-               output_mode="full"|"simple") -> Act | ActSummary   # Pydantic
+               output_mode="full"|"simple"|"transcription")
+    -> Act | ActSummary | Transcription   # Pydantic
 ```
 
 `provider` / `api_key` / `model` fall back to `TABELLIO_PROVIDER` /

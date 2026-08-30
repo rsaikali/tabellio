@@ -13,9 +13,9 @@ JSON**.
   consistency rules, not from trusting the model.
 - **No silent resolution.** Original spelling is kept, every date carries a
   `qualifier` (exact / about / calculated / …), every field a `confidence`.
-- **Verbatim transcription too.** `act.transcription` holds the full diplomatic
-  text of the act, `[?]` for an illegible word — alongside the structured fields,
-  in both output modes.
+- **Verbatim transcription too.** The full diplomatic text of the act, `[?]` for
+  an illegible word — as `act.transcription` in full mode, or on its own with
+  `output_mode="transcription"`.
 - **GEDCOM 7 out of the box.** `tabellio.to_gedcom(act)` — schema built to map
   cleanly to GEDCOM.
 - **Any language or script.** Text is transcribed in the language of the act
@@ -57,8 +57,8 @@ fields are `null` with a note — never guessed.
 ### Output modes
 
 ```python
-act = tabellio.parse("register-page.jpg", output_mode="simple")
-# ActSummary: type, date, location, persons[{role, given, surname}], transcription
+for mode in ("full", "simple", "transcription"):
+    print(tabellio.parse("register-page.jpg", output_mode=mode))
 ```
 
 - `output_mode="full"` (default) — rich `Act`: raw spelling, per-field
@@ -68,10 +68,12 @@ act = tabellio.parse("register-page.jpg", output_mode="simple")
   `persons[i].birth_date` / `death_date` with `qualifier: "calculated"` + a note
   when deduced. `validate` warns if a baptism or burial has no such date on its
   subject.
-- `output_mode="simple"` — sends a shorter prompt, returns a bare `ActSummary`:
-  `type`, `date` (ISO string or `null`), `location`, `persons`, plus the full
-  `transcription`. No confidence, no raw, no qualifiers, no notes, no
-  `language`, **no life-event dates** — use full for those.
+- `output_mode="simple"` — a bare `ActSummary`: `type`, `date` (ISO string or
+  `null`), `location`, `persons` (role / given / surname). Nothing else — no
+  confidence, no raw, no qualifiers, no `language`, no life-event dates, no
+  transcription. Shortest prompt, fewest tokens.
+- `output_mode="transcription"` — just `Transcription`: the verbatim `text` of
+  the act (`[?]` / `[illegible]` for gaps) plus the detected `language`.
 
 ### Hints
 
@@ -125,7 +127,7 @@ The key is never logged and never stored.
 ```bash
 export TABELLIO_PROVIDER=gemini
 export TABELLIO_KEY=...              # in your shell
-python -m tabellio data/act.jpg [--hint baptism] [--output simple] [--format gedcom] [-v]
+python -m tabellio data/act.jpg [--hint baptism] [--output simple|transcription] [--format gedcom] [-v]
 ```
 
 Prints the act as JSON (or GEDCOM 7 with `--format gedcom`) on stdout, warnings
