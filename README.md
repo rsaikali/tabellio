@@ -104,7 +104,9 @@ The schema is GEDCOM-mappable by design: `GenDate.qualifier`
 ### Configuration
 
 Three optional environment variables, each a fallback for the matching
-`parse()` argument. An explicit argument always wins.
+`parse()` argument. An explicit argument always wins. tabellio reads them from
+`os.environ` — it does not load a `.env` file; your application manages its own
+environment.
 
 | Variable | Fills | Default |
 |---|---|---|
@@ -171,6 +173,10 @@ make install     # uv sync --all-extras
 make lint        # ruff check + format --check
 make test        # pytest
 ```
+
+To run `python -m tabellio` against a real provider while developing, export
+`TABELLIO_KEY` (and optionally `TABELLIO_PROVIDER` / `TABELLIO_MODEL`) in your
+shell, or use your own `direnv` / dotenv — the repo ships none.
 
 The `data/` directory holds example acts — **fictional or public-domain only**,
 see [`data/README.md`](data/README.md).
